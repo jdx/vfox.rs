@@ -2,6 +2,7 @@
 name = "mise-vfox"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dependencies]
 mlua = { version = "0.9", features = ["lua54", "vendored"] }
