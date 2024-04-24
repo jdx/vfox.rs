@@ -99,13 +99,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
-name = "mise-vfox"
-version = "0.1.0"
-dependencies = [
- "mlua",
-]
-
-[[package]]
 name = "mlua"
 version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -225,6 +218,13 @@ name = "unicode-ident"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "vfox"
+version = "0.1.0"
+dependencies = [
+ "mlua",
+]
 
 [[package]]
 name = "which"
