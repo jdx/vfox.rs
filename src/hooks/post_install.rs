@@ -1,4 +1,5 @@
 use mlua::{UserData, UserDataFields};
+use crate::config::Config;
 
 use crate::error::Result;
 use crate::Plugin;
@@ -25,8 +26,9 @@ pub struct PostInstallContext {
 
 impl UserData for PostInstallContext {
     fn add_fields<'lua, F: UserDataFields<'lua, Self>>(fields: &mut F) {
+        let config = Config::get();
         fields.add_field_method_get("rootPath", |_, t| Ok(t.root_path.clone()));
-        fields.add_field_method_get("runtimeVersion", |_, _| Ok("1.0.0".to_string()));
+        fields.add_field_method_get("runtimeVersion", move |_, _| Ok(config.runtime_version.clone()));
     }
 }
 

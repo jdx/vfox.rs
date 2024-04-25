@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use mlua::{AsChunk, ExternalResult, FromLuaMulti, IntoLua, Lua, LuaSerdeExt, Table, Value};
 use once_cell::sync::OnceCell;
+use crate::config::Config;
 
 use crate::context::Context;
 use crate::error::Result;
@@ -21,6 +22,18 @@ impl Plugin {
             lua: Lua::new(),
             metadata: OnceCell::new(),
         })
+    }
+
+    pub fn list() -> Result<Vec<String>> {
+        let config = Config::get();
+        if !config.plugin_dir.exists() {
+            return Ok(vec![]);
+        }
+        let plugins = xx::file::ls(&config.plugin_dir)?;
+        let plugins = plugins.iter()
+            .filter_map(|p| p.file_name().and_then(|f| f.to_str()).map(|s| s.to_string()))
+            .collect();
+        Ok(plugins)
     }
 
     #[cfg(test)]
@@ -145,4 +158,14 @@ fn set_paths(lua: &Lua, paths: &[PathBuf]) -> Result<()> {
     get_package(lua)?.set("path", paths)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn list() {
+        Plugin::list().unwrap();
+    }
 }

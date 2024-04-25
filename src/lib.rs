@@ -18,3 +18,4 @@ mod hooks;
 mod metadata;
 mod context;
 mod runtime;
+mod config;
