@@ -16,12 +16,17 @@ pub struct Plugin {
 }
 
 impl Plugin {
-    pub fn new(dir: &Path) -> Result<Self> {
+    pub fn from_dir(dir: &Path) -> Result<Self> {
         Ok(Self {
             dir: dir.to_path_buf(),
             lua: Lua::new(),
             metadata: OnceCell::new(),
         })
+    }
+
+    pub fn from_name(name: &str) -> Result<Self> {
+        let dir = Config::get().plugin_dir.join(name);
+        Self::from_dir(&dir)
     }
 
     pub fn list() -> Result<Vec<String>> {
@@ -39,7 +44,7 @@ impl Plugin {
     #[cfg(test)]
     pub(crate) fn test(name: &str) -> Self {
         let dir = PathBuf::from("plugins").join(name);
-        Self::new(&dir).unwrap()
+        Self::from_dir(&dir).unwrap()
     }
 
     pub(crate) fn context(&self, version: Option<String>) -> Result<Context> {
