@@ -1,6 +1,6 @@
 use mlua::Table;
 
-use crate::Error;
+use crate::VFoxError;
 use crate::error::Result;
 
 #[derive(Debug)]
@@ -13,7 +13,7 @@ pub struct Metadata {
 }
 
 impl<'lua> TryFrom<Table<'lua>> for Metadata {
-    type Error = Error;
+    type Error = VFoxError;
     fn try_from(t: Table<'lua>) -> Result<Self> {
         let name = t.get::<_, String>("name")?;
         // let version = t.get::<_, String>("version")?;

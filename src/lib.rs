@@ -9,7 +9,7 @@ extern crate insta;
 // #[macro_use]
 // extern crate pretty_assertions;
 
-pub use error::Error;
+pub use error::VFoxError;
 pub use plugin::Plugin;
 
 mod error;
