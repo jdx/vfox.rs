@@ -12,12 +12,10 @@ impl Plugin {
 
     pub async fn pre_install_async(&self, version: &str) -> Result<PreInstall> {
         let ctx = self.context(Some(version.to_string()))?;
-        let pre_install = self.eval_async(
-            chunk! {
-                require "hooks/pre_install"
-                return PLUGIN:PreInstall($ctx)
-            },
-        ).await?;
+        let pre_install = self.eval_async(chunk! {
+            require "hooks/pre_install"
+            return PLUGIN:PreInstall($ctx)
+        }).await?;
 
         Ok(pre_install)
     }
@@ -57,6 +55,7 @@ impl<'lua> FromLua<'lua> for PreInstall {
 
 #[cfg(test)]
 mod tests {
+    use std::string::ToString;
     use crate::hooks::pre_install::PreInstall;
     use crate::Plugin;
     use crate::runtime::Runtime;

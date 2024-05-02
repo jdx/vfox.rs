@@ -11,12 +11,10 @@ impl Plugin {
     }
 
     pub async fn post_install_async(&self, ctx: PostInstallContext) -> Result<()> {
-        self.exec_async(
-            chunk! {
-                require "hooks/post_install"
-                PLUGIN:PostInstall($ctx)
-            },
-        ).await
+        self.exec_async(chunk! {
+            require "hooks/post_install"
+            PLUGIN:PostInstall($ctx)
+        }).await
     }
 }
 
