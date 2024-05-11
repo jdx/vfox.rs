@@ -17,19 +17,15 @@ name = "vfox-cli"
 path = "src/bin.rs"
 
 [dependencies]
-bzip2 = "0.4.4"
-flate2 = "1.0.30"
 homedir = "0.2.1"
 mlua = { version = "0.9", features = ["async", "lua54", "macros", "serialize", "vendored"] }
 once_cell = "1"
 reqwest = { version = "0.12", features = [] }
+scraper = "0.19.0"
 serde_json = "1"
-tar = "0.4.40"
 thiserror = "1"
 tokio = { version = "1", features = ["macros", "fs"] }
-xx = "0.3.0"
-xz = "0.1.0"
-zip = "1.2.3"
+xx = { version = "0.4", features = ["archive"] }
 
 [dev-dependencies]
 insta = "1"

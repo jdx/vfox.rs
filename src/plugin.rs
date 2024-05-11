@@ -6,10 +6,7 @@ use crate::config::Config;
 
 use crate::context::Context;
 use crate::error::Result;
-use crate::lua_mod::archiver::mod_archiver;
-use crate::lua_mod::http::mod_http;
-use crate::lua_mod::json::mod_json;
-use crate::lua_mod::strings::mod_strings;
+use crate::lua_mod;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
 
@@ -85,10 +82,12 @@ impl Plugin {
                 self.dir.join("lib/?.lua"),
             ])?;
 
-            mod_archiver(&self.lua)?;
-            mod_json(&self.lua)?;
-            mod_http(&self.lua)?;
-            mod_strings(&self.lua)?;
+            lua_mod::archiver(&self.lua)?;
+            lua_mod::file(&self.lua)?;
+            lua_mod::html(&self.lua)?;
+            lua_mod::http(&self.lua)?;
+            lua_mod::json(&self.lua)?;
+            lua_mod::strings(&self.lua)?;
 
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;

@@ -1,5 +1,5 @@
-use std::path::{Path, PathBuf};
-use mlua::{ExternalResult, Lua, Table, Value, ExternalError, IntoLuaMulti, MultiValue};
+use std::path::PathBuf;
+use mlua::{ExternalResult, Lua, Table, MultiValue};
 use crate::error::Result;
 
 pub fn mod_archiver(lua: &Lua) -> Result<()> {
@@ -14,56 +14,17 @@ async fn decompress<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> mlua::Res
     let paths = input.into_vec();
     let archive: PathBuf = PathBuf::from(paths[0].to_string()?);
     let destination: PathBuf = PathBuf::from(paths[1].to_string()?);
-    if archive.ends_with(".zip") {
-        unzip(&archive, &destination).into_lua_err()?;
-    } else if archive.ends_with(".tar.gz") {
-        untar_gz(&archive, &destination).into_lua_err()?;
-    } else if archive.ends_with(".tar.xz") {
-        untar_xz(&archive, &destination).into_lua_err()?;
-    } else if archive.ends_with(".tar.bz2") {
-        untar_bz2(&archive, &destination).into_lua_err()?;
+    let filename = archive.file_name().unwrap().to_str().unwrap();
+    if filename.ends_with(".zip") {
+        xx::archive::unzip(&archive, &destination).into_lua_err()?;
+    } else if filename.ends_with(".tar.gz") {
+        xx::archive::untar_gz(&archive, &destination).into_lua_err()?;
+    } else if filename.ends_with(".tar.xz") {
+        xx::archive::untar_xz(&archive, &destination).into_lua_err()?;
+    } else if filename.ends_with(".tar.bz2") {
+        xx::archive::untar_bz2(&archive, &destination).into_lua_err()?;
     } else {
         unimplemented!("Unsupported archive format {:?}", archive);
-    }
-    Ok(())
-}
-
-fn untar_gz(archive: &Path, destination: &Path) -> Result<()> {
-    let file = std::fs::File::open(&archive)?;
-    let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file));
-    archive.unpack(&destination)?;
-    Ok(())
-}
-
-fn untar_xz(archive: &Path, destination: &Path) -> Result<()> {
-    let file = std::fs::File::open(&archive)?;
-    let mut archive = tar::Archive::new(xz::read::XzDecoder::new(file));
-    archive.unpack(&destination)?;
-    Ok(())
-}
-
-fn untar_bz2(archive: &Path, destination: &Path) -> Result<()> {
-    let file = std::fs::File::open(&archive)?;
-    let mut archive = tar::Archive::new(bzip2::read::BzDecoder::new(file));
-    archive.unpack(&destination)?;
-    Ok(())
-}
-
-fn unzip(archive: &Path, destination: &Path) -> Result<()> {
-    let file = std::fs::File::open(&archive)?;
-    let mut archive = zip::ZipArchive::new(file)?;
-    for i in 0..archive.len() {
-        let mut file = archive.by_index(i)?;
-        let outpath = destination.join(file.name());
-        if file.is_dir() {
-            std::fs::create_dir_all(&outpath)?;
-        } else {
-            if let Some(p) = outpath.parent() {
-                std::fs::create_dir_all(p)?;
-            }
-            let mut outfile = std::fs::File::create(&outpath)?;
-            std::io::copy(&mut file, &mut outfile)?;
-        }
     }
     Ok(())
 }
@@ -73,8 +34,15 @@ mod tests {
     use super::*;
 
     #[test]
-    #[ignore]
-    fn test_decompress() {
-        // todo
+    fn test_zip() {
+        let _ = std::fs::remove_dir_all("/tmp/test_zip_dst");
+        let lua = Lua::new();
+        mod_archiver(&lua).unwrap();
+        lua.load(mlua::chunk! {
+            local archiver = require("archiver")
+            archiver.decompress("test/data/foo.zip", "/tmp/test_zip_dst")
+        }).exec().unwrap();
+        assert_eq!(std::fs::read_to_string("/tmp/test_zip_dst/foo/test.txt").unwrap(), "yep\n");
+        std::fs::remove_dir_all("/tmp/test_zip_dst").unwrap();
     }
 }

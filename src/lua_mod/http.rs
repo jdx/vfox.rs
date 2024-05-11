@@ -28,7 +28,7 @@ async fn download_file<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table
     let path: String = input.get("path").into_lua_err()?;
     let resp = reqwest::get(&url).await.into_lua_err()?;
     let t = lua.create_table()?;
-    t.set("content_length", resp.headers().get("content-length").map(|v| v.to_str().ok().map(|v| v.parse::<u64>().ok())).flatten())?;
+    t.set("content_length", resp.headers().get("content-length").and_then(|v| v.to_str().ok().map(|v| v.parse::<u64>().ok())))?;
     t.set("headers", get_headers(lua, resp.headers())?)?;
     t.set("status_code", resp.status().as_u16())?;
     resp.error_for_status_ref().into_lua_err()?;

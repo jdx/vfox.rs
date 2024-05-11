@@ -5,7 +5,7 @@ use crate::error::Result;
 
 #[derive(Debug)]
 pub struct Metadata {
-    pub name: String,
+    pub _name: String,
     // pub version: String,
     // pub description: String,
     // pub author: String,
@@ -21,7 +21,7 @@ impl<'lua> TryFrom<Table<'lua>> for Metadata {
         // let author = t.get::<_, String>("author")?;
         // let license = t.get::<_, String>("license")?;
         Ok(Metadata {
-            name,
+            _name: name,
             // version,
             // description,
             // author,
