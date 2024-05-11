@@ -17,7 +17,10 @@ impl Config {
     fn _get() -> MutexGuard<'static, Option<Config>> {
         let mut config = CONFIG.lock().unwrap();
         if config.is_none() {
-            let home = homedir::get_my_home().ok().flatten().unwrap_or_else(|| PathBuf::from("/"));
+            let home = homedir::get_my_home()
+                .ok()
+                .flatten()
+                .unwrap_or_else(|| PathBuf::from("/"));
             *config = Some(Config {
                 runtime_version: "1.0.0".to_string(),
                 plugin_dir: home.join(".version-fox/plugin"),

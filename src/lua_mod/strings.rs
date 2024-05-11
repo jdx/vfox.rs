@@ -4,15 +4,18 @@ use mlua::{Table, Value};
 pub fn mod_strings(lua: &Lua) -> LuaResult<()> {
     let package: Table = lua.globals().get("package")?;
     let loaded: Table = package.get("loaded")?;
-    loaded.set("vfox.strings", lua.create_table_from(vec![
-        ("split", lua.create_function(split)?),
-        ("has_prefix", lua.create_function(has_prefix)?),
-        ("has_suffix", lua.create_function(has_suffix)?),
-        ("trim", lua.create_function(trim)?),
-        ("trim_space", lua.create_function(trim_space)?),
-        ("contains", lua.create_function(contains)?),
-        ("join", lua.create_function(join)?),
-    ])?)?;
+    loaded.set(
+        "vfox.strings",
+        lua.create_table_from(vec![
+            ("split", lua.create_function(split)?),
+            ("has_prefix", lua.create_function(has_prefix)?),
+            ("has_suffix", lua.create_function(has_suffix)?),
+            ("trim", lua.create_function(trim)?),
+            ("trim_space", lua.create_function(trim_space)?),
+            ("contains", lua.create_function(contains)?),
+            ("join", lua.create_function(join)?),
+        ])?,
+    )?;
     Ok(())
 }
 
@@ -73,6 +76,8 @@ mod tests {
 
             local str = strings.join({"1",3,"4"},";")
             assert(str == "1;3;4", "strings.join()")
-        }).exec().unwrap();
+        })
+        .exec()
+        .unwrap();
     }
 }

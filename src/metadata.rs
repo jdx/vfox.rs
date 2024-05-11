@@ -1,7 +1,7 @@
 use mlua::Table;
 
-use crate::VFoxError;
 use crate::error::Result;
+use crate::VFoxError;
 
 #[derive(Debug)]
 pub struct Metadata {

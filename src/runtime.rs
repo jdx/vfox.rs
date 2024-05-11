@@ -1,6 +1,6 @@
+use mlua::{UserData, UserDataFields};
 use std::env::consts::{ARCH, OS};
 use std::sync::{Mutex, MutexGuard};
-use mlua::{UserData, UserDataFields};
 
 #[derive(Debug, Clone)]
 pub(crate) struct Runtime {

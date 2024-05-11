@@ -3,9 +3,10 @@ use mlua::{Lua, MultiValue, Table};
 pub fn mod_html(lua: &Lua) -> mlua::Result<()> {
     let package: Table = lua.globals().get("package")?;
     let loaded: Table = package.get("loaded")?;
-    loaded.set("html", lua.create_table_from(vec![
-        ("parse", lua.create_function(parse)?),
-    ])?)?;
+    loaded.set(
+        "html",
+        lua.create_table_from(vec![("parse", lua.create_function(parse)?)])?,
+    )?;
     Ok(())
 }
 
@@ -14,23 +15,26 @@ fn parse(lua: &Lua, html: String) -> mlua::Result<Table> {
     let _root = document.root_element();
     lua.scope(|scope| {
         let table = lua.create_table()?;
-        table.set("find", scope.create_function(|lua, input: MultiValue| {
-            let _tag: String = input.iter().nth(1).unwrap().to_string()?;
-            let table = lua.create_table()?;
-            // TODO: make this work
-            // table.set("eq", lua.create_function(move |lua, input: MultiValue| {
-            //     let idx: usize = input.iter().nth(1).unwrap().to_string()?.parse().unwrap();
-            //     let selector = scraper::Selector::parse(&tag).map_err(|e| mlua::Error::external(e.to_string()))?;
-            //     let elements = root.select(&selector).collect::<Vec<_>>();
-            //     let element = elements.get(idx).ok_or_else(|| mlua::Error::external("Index out of bounds"))?;
-            //     let table = lua.create_table()?;
-            //     table.set("text", lua.create_function(move |_, _: ()| {
-            //         Ok(element.text().collect::<String>())
-            //     })?)?;
-            //     Ok(table)
-            // })?)?;
-            Ok(table)
-        })?)?;
+        table.set(
+            "find",
+            scope.create_function(|lua, input: MultiValue| {
+                let _tag: String = input.iter().nth(1).unwrap().to_string()?;
+                let table = lua.create_table()?;
+                // TODO: make this work
+                // table.set("eq", lua.create_function(move |lua, input: MultiValue| {
+                //     let idx: usize = input.iter().nth(1).unwrap().to_string()?.parse().unwrap();
+                //     let selector = scraper::Selector::parse(&tag).map_err(|e| mlua::Error::external(e.to_string()))?;
+                //     let elements = root.select(&selector).collect::<Vec<_>>();
+                //     let element = elements.get(idx).ok_or_else(|| mlua::Error::external("Index out of bounds"))?;
+                //     let table = lua.create_table()?;
+                //     table.set("text", lua.create_function(move |_, _: ()| {
+                //         Ok(element.text().collect::<String>())
+                //     })?)?;
+                //     Ok(table)
+                // })?)?;
+                Ok(table)
+            })?,
+        )?;
         Ok(table)
     })
 }

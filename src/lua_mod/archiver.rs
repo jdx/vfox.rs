@@ -1,13 +1,14 @@
-use std::path::PathBuf;
-use mlua::{ExternalResult, Lua, Table, MultiValue};
 use crate::error::Result;
+use mlua::{ExternalResult, Lua, MultiValue, Table};
+use std::path::PathBuf;
 
 pub fn mod_archiver(lua: &Lua) -> Result<()> {
     let package: Table = lua.globals().get("package")?;
     let loaded: Table = package.get("loaded")?;
-    Ok(loaded.set("archiver", lua.create_table_from(vec![
-        ("decompress", lua.create_async_function(decompress)?),
-    ])?)?)
+    Ok(loaded.set(
+        "archiver",
+        lua.create_table_from(vec![("decompress", lua.create_async_function(decompress)?)])?,
+    )?)
 }
 
 async fn decompress<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> mlua::Result<()> {
@@ -41,8 +42,13 @@ mod tests {
         lua.load(mlua::chunk! {
             local archiver = require("archiver")
             archiver.decompress("test/data/foo.zip", "/tmp/test_zip_dst")
-        }).exec().unwrap();
-        assert_eq!(std::fs::read_to_string("/tmp/test_zip_dst/foo/test.txt").unwrap(), "yep\n");
+        })
+        .exec()
+        .unwrap();
+        assert_eq!(
+            std::fs::read_to_string("/tmp/test_zip_dst/foo/test.txt").unwrap(),
+            "yep\n"
+        );
         std::fs::remove_dir_all("/tmp/test_zip_dst").unwrap();
     }
 }

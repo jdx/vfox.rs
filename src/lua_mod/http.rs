@@ -1,13 +1,16 @@
-use mlua::{ExternalResult, Result, Lua, Table, MultiValue};
+use mlua::{ExternalResult, Lua, MultiValue, Result, Table};
 
 pub fn mod_http(lua: &Lua) -> Result<()> {
     let package: Table = lua.globals().get("package")?;
     let loaded: Table = package.get("loaded")?;
-    loaded.set("http", lua.create_table_from(vec![
-        ("get", lua.create_async_function(get)?),
-        ("head", lua.create_async_function(head)?),
-        ("download_file", lua.create_async_function(download_file)?),
-    ])?)
+    loaded.set(
+        "http",
+        lua.create_table_from(vec![
+            ("get", lua.create_async_function(get)?),
+            ("head", lua.create_async_function(head)?),
+            ("download_file", lua.create_async_function(download_file)?),
+        ])?,
+    )
 }
 
 async fn get<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
@@ -24,14 +27,16 @@ async fn get<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
 }
 
 async fn download_file<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> Result<()> {
-    let t: &Table = input.iter().nth(0).unwrap().as_table().unwrap();
+    let t: &Table = input.iter().next().unwrap().as_table().unwrap();
     let url: String = t.get("url").into_lua_err()?;
     let path: String = input.iter().nth(1).unwrap().to_string()?;
     let resp = reqwest::get(&url).await.into_lua_err()?;
     resp.error_for_status_ref().into_lua_err()?;
     let mut file = tokio::fs::File::create(&path).await.into_lua_err()?;
     let bytes = resp.bytes().await.into_lua_err()?;
-    tokio::io::AsyncWriteExt::write_all(&mut file, &bytes).await.into_lua_err()?;
+    tokio::io::AsyncWriteExt::write_all(&mut file, &bytes)
+        .await
+        .into_lua_err()?;
     Ok(())
 }
 
@@ -59,8 +64,8 @@ fn get_headers<'lua>(lua: &'lua Lua, headers: &reqwest::header::HeaderMap) -> Re
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
     use super::*;
+    use std::fs;
 
     #[tokio::test]
     async fn test_get() {
@@ -71,7 +76,10 @@ mod tests {
             local resp = http.get({ url = "https://httpbin.org/get" })
             assert(resp.status_code == 200)
             assert(type(resp.body) == "string")
-        }).exec_async().await.unwrap();
+        })
+        .exec_async()
+        .await
+        .unwrap();
     }
 
     #[tokio::test]
@@ -86,7 +94,10 @@ mod tests {
             assert(type(resp.headers) == "table")
             assert(resp.headers["content-type"] == "application/json")
             assert(resp.content_length == nil)
-        }).exec_async().await.unwrap();
+        })
+        .exec_async()
+        .await
+        .unwrap();
     }
 
     #[tokio::test]
@@ -101,7 +112,10 @@ mod tests {
                 headers = {}
             }, $path)
             assert(err == nil, [[must be nil]])
-        }).exec_async().await.unwrap();
+        })
+        .exec_async()
+        .await
+        .unwrap();
         dbg!(fs::read_to_string(path).unwrap());
         // TODO: figure out why this fails on gha
         assert!(fs::read_to_string(path).unwrap().contains("vfox-nodejs"));

@@ -12,11 +12,11 @@ extern crate insta;
 pub use error::VFoxError;
 pub use plugin::Plugin;
 
-mod error;
-mod plugin;
-mod hooks;
-mod metadata;
-mod context;
-mod runtime;
 mod config;
+mod context;
+mod error;
+mod hooks;
 mod lua_mod;
+mod metadata;
+mod plugin;
+mod runtime;

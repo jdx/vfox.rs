@@ -1,5 +1,5 @@
-use mlua::{FromLua, Lua, Value};
 use mlua::prelude::LuaError;
+use mlua::{FromLua, Lua, Value};
 
 use crate::error::Result;
 use crate::Plugin;
@@ -12,10 +12,12 @@ impl Plugin {
 
     pub async fn available_async(&self) -> Result<Vec<AvailableVersion>> {
         let ctx = self.context(None)?;
-        let available = self.eval_async(chunk! {
-            require "hooks/available"
-            return PLUGIN:Available($ctx)
-        }).await?;
+        let available = self
+            .eval_async(chunk! {
+                require "hooks/available"
+                return PLUGIN:Available($ctx)
+            })
+            .await?;
 
         Ok(available)
     }

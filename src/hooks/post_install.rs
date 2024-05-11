@@ -1,5 +1,5 @@
-use mlua::{UserData, UserDataFields};
 use crate::config::Config;
+use mlua::{UserData, UserDataFields};
 
 use crate::error::Result;
 use crate::Plugin;
@@ -14,7 +14,8 @@ impl Plugin {
         self.exec_async(chunk! {
             require "hooks/post_install"
             PLUGIN:PostInstall($ctx)
-        }).await
+        })
+        .await
     }
 }
 
@@ -26,7 +27,9 @@ impl UserData for PostInstallContext {
     fn add_fields<'lua, F: UserDataFields<'lua, Self>>(fields: &mut F) {
         let config = Config::get();
         fields.add_field_method_get("rootPath", |_, t| Ok(t.root_path.clone()));
-        fields.add_field_method_get("runtimeVersion", move |_, _| Ok(config.runtime_version.clone()));
+        fields.add_field_method_get("runtimeVersion", move |_, _| {
+            Ok(config.runtime_version.clone())
+        });
     }
 }
 

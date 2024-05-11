@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
+use crate::config::Config;
 use mlua::{AsChunk, FromLuaMulti, IntoLua, Lua, Table};
 use once_cell::sync::OnceCell;
-use crate::config::Config;
 
 use crate::context::Context;
 use crate::error::Result;
@@ -36,8 +36,13 @@ impl Plugin {
             return Ok(vec![]);
         }
         let plugins = xx::file::ls(&config.plugin_dir)?;
-        let plugins = plugins.iter()
-            .filter_map(|p| p.file_name().and_then(|f| f.to_str()).map(|s| s.to_string()))
+        let plugins = plugins
+            .iter()
+            .filter_map(|p| {
+                p.file_name()
+                    .and_then(|f| f.to_str())
+                    .map(|s| s.to_string())
+            })
             .collect();
         Ok(plugins)
     }
@@ -57,16 +62,22 @@ impl Plugin {
         Ok(ctx)
     }
 
-    pub(crate) async fn exec_async<'lua, 'a>(&'lua self, chunk: impl AsChunk<'lua, 'a>) -> Result<()> {
+    pub(crate) async fn exec_async<'lua, 'a>(
+        &'lua self,
+        chunk: impl AsChunk<'lua, 'a>,
+    ) -> Result<()> {
         self.load()?;
         let chunk = self.lua.load(chunk);
         chunk.exec_async().await?;
         Ok(())
     }
 
-    pub(crate) async fn eval_async<'lua, 'a, R>(&'lua self, chunk: impl AsChunk<'lua, 'a>) -> Result<R>
-        where
-            R: FromLuaMulti<'lua> + 'lua
+    pub(crate) async fn eval_async<'lua, 'a, R>(
+        &'lua self,
+        chunk: impl AsChunk<'lua, 'a>,
+    ) -> Result<R>
+    where
+        R: FromLuaMulti<'lua> + 'lua,
     {
         self.load()?;
         let chunk = self.lua.load(chunk);
@@ -76,11 +87,14 @@ impl Plugin {
 
     fn load(&self) -> Result<&Metadata> {
         self.metadata.get_or_try_init(|| {
-            set_paths(&self.lua, &[
-                self.dir.join("?.lua"),//xx
-                self.dir.join("hooks/?.lua"),
-                self.dir.join("lib/?.lua"),
-            ])?;
+            set_paths(
+                &self.lua,
+                &[
+                    self.dir.join("?.lua"), //xx
+                    self.dir.join("hooks/?.lua"),
+                    self.dir.join("lib/?.lua"),
+                ],
+            )?;
 
             lua_mod::archiver(&self.lua)?;
             lua_mod::file(&self.lua)?;
@@ -97,20 +111,22 @@ impl Plugin {
         })
     }
 
-
     fn set_global<'lua, V>(&'lua self, name: &str, value: V) -> Result<()>
-        where
-            V: IntoLua<'lua>
+    where
+        V: IntoLua<'lua>,
     {
         self.lua.globals().set(name, value)?;
         Ok(())
     }
 
     fn load_metadata(&self) -> Result<Table> {
-        let metadata = self.lua.load(chunk! {
-            require "metadata"
-            return PLUGIN
-        }).eval()?;
+        let metadata = self
+            .lua
+            .load(chunk! {
+                require "metadata"
+                return PLUGIN
+            })
+            .eval()?;
         Ok(metadata)
     }
 }
@@ -121,7 +137,8 @@ fn get_package(lua: &Lua) -> Result<Table> {
 }
 
 fn set_paths(lua: &Lua, paths: &[PathBuf]) -> Result<()> {
-    let paths = paths.iter()
+    let paths = paths
+        .iter()
         .map(|p| p.to_string_lossy().to_string())
         .collect::<Vec<String>>()
         .join(";");
