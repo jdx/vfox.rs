@@ -5,7 +5,7 @@ pub fn mod_strings(lua: &Lua) -> LuaResult<()> {
     let package: Table = lua.globals().get("package")?;
     let loaded: Table = package.get("loaded")?;
     loaded.set(
-        "vfox.strings",
+        "strings",
         lua.create_table_from(vec![
             ("split", lua.create_function(split)?),
             ("has_prefix", lua.create_function(has_prefix)?),
@@ -63,7 +63,7 @@ mod tests {
         let lua = Lua::new();
         mod_strings(&lua).unwrap();
         lua.load(mlua::chunk! {
-            local strings = require("vfox.strings")
+            local strings = require("strings")
             local str_parts = strings.split("hello world", " ")
             print(str_parts[1]) -- hello
 
