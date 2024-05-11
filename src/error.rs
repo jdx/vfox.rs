@@ -11,6 +11,12 @@ pub enum VFoxError {
     SerdeJsonError(#[from] serde_json::Error),
     #[error(transparent)]
     XXError(#[from] XXError),
+    #[error(transparent)]
+    ReqwestError(#[from] reqwest::Error),
+    #[error(transparent)]
+    IoError(#[from] std::io::Error),
+    #[error(transparent)]
+    ZipError(#[from] zip::result::ZipError),
 }
 
 pub type Result<T> = std::result::Result<T, VFoxError>;
