@@ -1,4 +1,4 @@
-use mlua::{ExternalResult, Result, Lua, Table};
+use mlua::{ExternalResult, Result, Lua, Table, MultiValue};
 
 pub fn mod_http(lua: &Lua) -> Result<()> {
     let package: Table = lua.globals().get("package")?;
@@ -23,19 +23,16 @@ async fn get<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
     Ok(t)
 }
 
-async fn download_file<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
-    let url: String = input.get("url").into_lua_err()?;
-    let path: String = input.get("path").into_lua_err()?;
+async fn download_file<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> Result<()> {
+    let t: &Table = input.iter().nth(0).unwrap().as_table().unwrap();
+    let url: String = t.get("url").into_lua_err()?;
+    let path: String = input.iter().nth(1).unwrap().to_string()?;
     let resp = reqwest::get(&url).await.into_lua_err()?;
-    let t = lua.create_table()?;
-    t.set("content_length", resp.headers().get("content-length").and_then(|v| v.to_str().ok().map(|v| v.parse::<u64>().ok())))?;
-    t.set("headers", get_headers(lua, resp.headers())?)?;
-    t.set("status_code", resp.status().as_u16())?;
     resp.error_for_status_ref().into_lua_err()?;
     let mut file = tokio::fs::File::create(&path).await.into_lua_err()?;
     let bytes = resp.bytes().await.into_lua_err()?;
     tokio::io::AsyncWriteExt::write_all(&mut file, &bytes).await.into_lua_err()?;
-    Ok(t)
+    Ok(())
 }
 
 async fn head<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
@@ -99,14 +96,15 @@ mod tests {
         let path = "test/data/test_download_file.txt";
         lua.load(mlua::chunk! {
             local http = require("http")
-            local resp = http.download_file({ url = "https://vfox-plugins.lhan.me/index.json", path = $path })
-            assert(resp.status_code == 200)
-            assert(type(resp.headers) == "table")
-            assert(type(resp.content_length) == "number")
+            err = http.download_file({
+                url = "https://vfox-plugins.lhan.me/index.json",
+                headers = {}
+            }, $path)
+            assert(err == nil, [[must be nil]])
         }).exec_async().await.unwrap();
         dbg!(fs::read_to_string(path).unwrap());
         // TODO: figure out why this fails on gha
-        // assert!(fs::read_to_string(path).unwrap().contains("vfox-nodejs"));
+        assert!(fs::read_to_string(path).unwrap().contains("vfox-nodejs"));
         tokio::fs::remove_file(path).await.unwrap();
     }
 }
