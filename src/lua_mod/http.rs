@@ -99,14 +99,13 @@ mod tests {
         let path = "test/data/test_download_file.txt";
         lua.load(mlua::chunk! {
             local http = require("http")
-            local resp = http.download_file({ url = "https://httpbin.org/get", path = $path })
+            local resp = http.download_file({ url = "https://vfox-plugins.lhan.me/index.json", path = $path })
             assert(resp.status_code == 200)
             assert(type(resp.headers) == "table")
-            assert(resp.headers["content-type"] == "application/json")
             assert(type(resp.content_length) == "number")
         }).exec_async().await.unwrap();
         dbg!(fs::read_to_string(path).unwrap());
-        assert!(fs::read_to_string(path).unwrap().contains("httpbin"));
+        assert!(fs::read_to_string(path).unwrap().contains("vfox-nodejs"));
         tokio::fs::remove_file(path).await.unwrap();
     }
 }
