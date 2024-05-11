@@ -8,6 +8,14 @@ documentation = "https://docs.rs/vfox"
 homepage = "https://github.com/jdx/vfox.rs"
 repository = "https://github.com/jdx/vfox.rs"
 
+[lib]
+name = "vfox"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vfox-cli"
+path = "src/bin.rs"
+
 [dependencies]
 homedir = "0.2.1"
 mlua = { version = "0.9", features = ["async", "lua54", "macros", "serialize", "vendored"] }

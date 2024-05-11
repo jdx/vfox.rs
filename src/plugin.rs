@@ -6,6 +6,7 @@ use crate::config::Config;
 
 use crate::context::Context;
 use crate::error::Result;
+use crate::lua_mod::http::mod_http;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
 
@@ -82,7 +83,7 @@ impl Plugin {
             ])?;
 
             self.set_mod("json", self.mod_json()?)?;
-            self.set_mod("http", self.mod_http()?)?;
+            self.set_mod("http", mod_http(&self.lua)?)?;
 
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;
@@ -120,24 +121,6 @@ impl Plugin {
         let t = self.lua.create_table_from(vec![
             ("encode", encode),
             ("decode", decode),
-        ])?;
-        Ok(t)
-    }
-
-    fn mod_http(&self) -> Result<Table> {
-        let get = self.lua.create_async_function(|lua, input: Table| async move {
-            let url: String = input.get("url").into_lua_err()?;
-            let resp = reqwest::get(&url)
-                .await
-                .and_then(|resp| resp.error_for_status())
-                .into_lua_err()?;
-            let t = lua.create_table()?;
-            t.set("status_code", resp.status().as_u16())?;
-            t.set("body", resp.text().await.into_lua_err()?)?;
-            Ok(t)
-        })?;
-        let t = self.lua.create_table_from(vec![
-            ("get", get),
         ])?;
         Ok(t)
     }

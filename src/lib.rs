@@ -19,3 +19,4 @@ mod metadata;
 mod context;
 mod runtime;
 mod config;
+mod lua_mod;
