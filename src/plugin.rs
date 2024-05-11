@@ -110,12 +110,6 @@ impl Plugin {
         }).eval()?;
         Ok(metadata)
     }
-
-    fn set_mod(&self, name: &str, m: Table) -> Result<()> {
-        let loaded = get_package(&self.lua)?.get::<_, Table>("loaded")?;
-        loaded.set(name, m)?;
-        Ok(())
-    }
 }
 
 fn get_package(lua: &Lua) -> Result<Table> {
