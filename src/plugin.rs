@@ -8,6 +8,7 @@ use crate::context::Context;
 use crate::error::Result;
 use crate::lua_mod::http::mod_http;
 use crate::lua_mod::json::mod_json;
+use crate::lua_mod::strings::mod_strings;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
 
@@ -85,6 +86,7 @@ impl Plugin {
 
             mod_json(&self.lua)?;
             mod_http(&self.lua)?;
+            mod_strings(&self.lua)?;
 
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;
