@@ -1,12 +1,13 @@
 use std::path::{Path, PathBuf};
 
-use mlua::{AsChunk, ExternalResult, FromLuaMulti, IntoLua, Lua, LuaSerdeExt, Table, Value};
+use mlua::{AsChunk, FromLuaMulti, IntoLua, Lua, Table};
 use once_cell::sync::OnceCell;
 use crate::config::Config;
 
 use crate::context::Context;
 use crate::error::Result;
 use crate::lua_mod::http::mod_http;
+use crate::lua_mod::json::mod_json;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
 
@@ -82,7 +83,7 @@ impl Plugin {
                 self.dir.join("lib/?.lua"),
             ])?;
 
-            self.set_mod("json", self.mod_json()?)?;
+            self.set_mod("json", mod_json(&self.lua)?)?;
             self.set_mod("http", mod_http(&self.lua)?)?;
 
             let metadata = self.load_metadata()?;
@@ -108,21 +109,6 @@ impl Plugin {
             return PLUGIN
         }).eval()?;
         Ok(metadata)
-    }
-
-    fn mod_json(&self) -> Result<Table> {
-        let encode = self.lua.create_function(|_, value: Value| {
-            serde_json::to_string(&value).into_lua_err()
-        })?;
-        let decode = self.lua.create_function(|lua, value: String| {
-            let value: serde_json::Value = serde_json::from_str(&value).into_lua_err()?;
-            Ok(lua.to_value(&value))
-        })?;
-        let t = self.lua.create_table_from(vec![
-            ("encode", encode),
-            ("decode", decode),
-        ])?;
-        Ok(t)
     }
 
     fn set_mod(&self, name: &str, m: Table) -> Result<()> {
