@@ -96,7 +96,7 @@ mod tests {
     async fn test_download_file() {
         let lua = Lua::new();
         mod_http(&lua).unwrap();
-        let path = "/tmp/test_download_file.txt";
+        let path = "test/data/test_download_file.txt";
         lua.load(mlua::chunk! {
             local http = require("http")
             local resp = http.download_file({ url = "https://httpbin.org/get", path = $path })
@@ -105,6 +105,7 @@ mod tests {
             assert(resp.headers["content-type"] == "application/json")
             assert(type(resp.content_length) == "number")
         }).exec_async().await.unwrap();
+        dbg!(fs::read_to_string(path).unwrap());
         assert!(fs::read_to_string(path).unwrap().contains("httpbin"));
         tokio::fs::remove_file(path).await.unwrap();
     }
