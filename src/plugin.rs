@@ -83,8 +83,8 @@ impl Plugin {
                 self.dir.join("lib/?.lua"),
             ])?;
 
-            self.set_mod("json", mod_json(&self.lua)?)?;
-            self.set_mod("http", mod_http(&self.lua)?)?;
+            mod_json(&self.lua)?;
+            mod_http(&self.lua)?;
 
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;
