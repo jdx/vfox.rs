@@ -8,7 +8,7 @@ mod cli;
 #[cfg(feature = "cli")]
 #[tokio::main]
 async fn main() {
-    env_logger::init();
+    env_logger::init_from_env(env_logger::Env::default().filter_or("VFOX_LOG", "info"));
     if let Err(err) = cli::run().await {
         error!("{err}");
         std::process::exit(1);

@@ -61,7 +61,7 @@ impl Plugin {
         let url = pre_install.url.as_ref().unwrap();
         // TODO: add download_async to xx
         info!("Downloading {url}");
-        xx::http::download(url, "tarball.tar.gz")?;
+        xx::http::download(url, "tarball.tar.gz").await?;
         Ok(())
     }
 

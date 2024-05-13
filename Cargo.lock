@@ -1759,7 +1759,6 @@ dependencies = [
  "base64",
  "bytes",
  "encoding_rs",
- "futures-channel",
  "futures-core",
  "futures-util",
  "h2",
@@ -2877,9 +2876,9 @@ dependencies = [
 
 [[package]]
 name = "xx"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "811f0898d48c3a828602141df8785ba747898d8e56e7732d701fd5f1e4f525e9"
+checksum = "d4c55b83ffe30f8b5f8144bd94af5be173d88139310ddfac10e69e24a70a2ffb"
 dependencies = [
  "bzip2",
  "duct",
@@ -2891,6 +2890,7 @@ dependencies = [
  "reqwest",
  "tar",
  "thiserror",
+ "tokio",
  "xz",
  "zip",
 ]
