@@ -26,10 +26,14 @@ serde_json = "1"
 thiserror = "1"
 tokio = { version = "1", features = ["macros", "fs"] }
 xx = { version = "0.4", features = ["archive"] }
+clap = { version = "4", features = ["derive"], optional = true }
 
 [dev-dependencies]
 insta = "1"
 #pretty_assertions = "1.4.0"
+
+[features]
+cli = ["clap", "tokio/full"]
 
 [workspace.metadata.release]
 pre-release-hook = ["git", "cliff", "-o", "CHANGELOG.md", "--tag", "{{version}}"]

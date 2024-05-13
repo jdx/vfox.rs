@@ -1,6 +1,6 @@
-fn main() {
-    // Statements here are executed when the compiled binary is called.
+mod cli;
 
-    // Print text to the console.
-    println!("Hello World!");
+#[tokio::main]
+async fn main() {
+    cli::run().await;
 }
