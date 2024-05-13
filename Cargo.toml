@@ -27,7 +27,7 @@ scraper = "0.19.0"
 serde_json = "1"
 thiserror = "1"
 tokio = { version = "1", features = ["macros", "fs"] }
-xx = { version = "0.4", features = ["archive"] }
+xx = { version = "1", features = ["archive", "http"] }
 
 # cli dependencies
 env_logger = { version = "0.11.3", optional = true }
