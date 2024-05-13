@@ -1,4 +1,8 @@
 use std::path::PathBuf;
+
+use itertools::Itertools;
+
+use crate::error::Result;
 use crate::plugin::Plugin;
 
 pub struct Vfox {
@@ -11,8 +15,25 @@ impl Vfox {
         Self::default()
     }
 
-    pub fn list_plugins() -> Vec<Plugin> {
-        vec![]
+    pub fn list_sdks(&self) -> Result<Vec<Plugin>> {
+        if !self.plugin_dir.exists() {
+            return Ok(Default::default());
+        }
+        let plugins = xx::file::ls(&self.plugin_dir)?;
+        plugins
+            .into_iter()
+            .filter_map(|p| {
+                p.file_name()
+                    .and_then(|f| f.to_str())
+                    .map(|s| s.to_string())
+            })
+            .sorted()
+            .map(|name| self.get_sdk(&name))
+            .collect()
+    }
+
+    pub fn get_sdk(&self, name: &str) -> Result<Plugin> {
+        Plugin::from_dir(&self.plugin_dir.join(name))
     }
 }
 

@@ -4,10 +4,12 @@ use xx::XXError;
 
 #[derive(Error, Debug)]
 #[non_exhaustive]
-pub enum VFoxError {
+pub enum VfoxError {
+    #[error("{0}")]
+    Error(String),
     #[error(transparent)]
     LuaError(#[from] MLuaError),
-    #[error("serde_json error")]
+    #[error("serde_json")]
     SerdeJsonError(#[from] serde_json::Error),
     #[error(transparent)]
     XXError(#[from] XXError),
@@ -17,4 +19,11 @@ pub enum VFoxError {
     IoError(#[from] std::io::Error),
 }
 
-pub type Result<T> = std::result::Result<T, VFoxError>;
+pub type Result<T> = std::result::Result<T, VfoxError>;
+
+#[macro_export]
+macro_rules! error {
+    ($($arg:tt)*) => {
+        return Err(VfoxError::Error(format!($($arg)*)));
+    };
+}

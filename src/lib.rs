@@ -4,7 +4,8 @@ extern crate insta;
 #[macro_use]
 extern crate mlua;
 
-pub use error::VFoxError;
+pub use error::Result as VfoxResult;
+pub use error::VfoxError;
 pub use plugin::Plugin;
 pub use vfox::Vfox;
 

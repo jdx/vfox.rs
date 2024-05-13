@@ -1,16 +1,20 @@
+use std::cmp::Ordering;
+use std::fmt::Display;
 use std::path::{Path, PathBuf};
 
-use crate::config::Config;
 use mlua::{AsChunk, FromLuaMulti, IntoLua, Lua, Table};
 use once_cell::sync::OnceCell;
 
+use crate::config::Config;
 use crate::context::Context;
 use crate::error::Result;
-use crate::lua_mod;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
+use crate::{error, lua_mod, VfoxError};
 
+#[derive(Debug)]
 pub struct Plugin {
+    pub name: String,
     pub dir: PathBuf,
     lua: Lua,
     metadata: OnceCell<Metadata>,
@@ -18,7 +22,11 @@ pub struct Plugin {
 
 impl Plugin {
     pub fn from_dir(dir: &Path) -> Result<Self> {
+        if !dir.exists() {
+            error!("Plugin directory not found: {:?}", dir);
+        }
         Ok(Self {
+            name: dir.file_name().unwrap().to_string_lossy().to_string(),
             dir: dir.to_path_buf(),
             lua: Lua::new(),
             metadata: OnceCell::new(),
@@ -45,6 +53,12 @@ impl Plugin {
             })
             .collect();
         Ok(plugins)
+    }
+
+    pub async fn install_async(&self, version: &str) -> Result<()> {
+        let pre_install = self.pre_install_async(version).await?;
+        dbg!(&pre_install);
+        unimplemented!("TODO: xx::http::download");
     }
 
     #[cfg(test)]
@@ -146,6 +160,32 @@ fn set_paths(lua: &Lua, paths: &[PathBuf]) -> Result<()> {
     get_package(lua)?.set("path", paths)?;
 
     Ok(())
+}
+
+impl Display for Plugin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+
+impl PartialEq<Self> for Plugin {
+    fn eq(&self, other: &Self) -> bool {
+        self.dir == other.dir
+    }
+}
+
+impl Eq for Plugin {}
+
+impl PartialOrd for Plugin {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Plugin {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.name.cmp(&other.name)
+    }
 }
 
 #[cfg(test)]

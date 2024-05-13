@@ -1,16 +1,17 @@
-use std::env;
-use clap::Args;
-use crate::Vfox;
+use vfox::{Vfox, VfoxResult};
 
-#[derive(Args)]
+#[derive(clap::Args)]
 pub struct Install {
-    pub name: String,
+    pub sdk: String,
     pub version: String,
 }
 
 impl Install {
-    pub async fn run(&self) {
-        // env::temp_dir().push("vfox").create_dir_all().await.unwrap();
-        println!("Installing {} version {}", self.name, self.version);
+    pub async fn run(&self) -> VfoxResult<()> {
+        let vfox = Vfox::new();
+        let sdk = vfox.get_sdk(&self.sdk)?;
+        info!("Installing {sdk} version {}", self.version);
+        sdk.install_async(&self.version).await?;
+        Ok(())
     }
 }

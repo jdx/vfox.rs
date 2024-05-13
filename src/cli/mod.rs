@@ -1,22 +1,32 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
+use vfox::VfoxResult;
 
 mod install;
+mod plugins;
 
 #[derive(Parser)]
 #[command(version)]
-struct Cli {
+pub(crate) struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
 
-#[derive(Subcommand)]
+#[derive(clap::Subcommand)]
 enum Commands {
     Install(install::Install),
+    #[command(alias = "plugin")]
+    Plugins(plugins::Plugins),
 }
 
-pub async fn run() {
-    let args = Cli::parse();
-    match args.command {
-        Commands::Install(install) => install.run().await,
+impl Commands {
+    pub async fn run(self) -> VfoxResult<()> {
+        match self {
+            Commands::Install(install) => install.run().await,
+            Commands::Plugins(plugins) => plugins.run().await,
+        }
     }
+}
+
+pub async fn run() -> VfoxResult<()> {
+    Cli::parse().command.run().await
 }
