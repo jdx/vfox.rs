@@ -11,7 +11,7 @@ impl Install {
         let vfox = Vfox::new();
         let sdk = vfox.get_sdk(&self.sdk)?;
         info!("Installing {sdk} version {}", self.version);
-        sdk.install_async(&self.version).await?;
+        sdk.install(&self.version).await?;
         Ok(())
     }
 }

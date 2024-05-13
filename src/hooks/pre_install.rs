@@ -5,12 +5,7 @@ use crate::error::Result;
 use crate::Plugin;
 
 impl Plugin {
-    #[tokio::main(flavor = "current_thread")]
     pub async fn pre_install(&self, version: &str) -> Result<PreInstall> {
-        self.pre_install_async(version).await
-    }
-
-    pub async fn pre_install_async(&self, version: &str) -> Result<PreInstall> {
         let ctx = self.context(Some(version.to_string()))?;
         let pre_install = self
             .eval_async(chunk! {
@@ -61,35 +56,36 @@ mod tests {
     use crate::runtime::Runtime;
     use crate::Plugin;
     use std::string::ToString;
+    use tokio::test;
 
     #[test]
-    fn dummy() {
-        let pre_install = run("vfox-dummy", "1.0.1");
+    async fn dummy() {
+        let pre_install = run("vfox-dummy", "1.0.1").await;
         assert_debug_snapshot!(pre_install);
     }
 
     #[test]
-    fn nodejs() {
+    async fn nodejs() {
         Runtime::set_os("linux".to_string());
         Runtime::set_arch("x64".to_string());
-        let pre_install = run("vfox-nodejs", "20.0.0");
+        let pre_install = run("vfox-nodejs", "20.0.0").await;
         assert_debug_snapshot!(pre_install);
 
         Runtime::set_os("macos".to_string());
         Runtime::set_arch("arm64".to_string());
-        let pre_install = run("vfox-nodejs", "20.1.0");
+        let pre_install = run("vfox-nodejs", "20.1.0").await;
         assert_debug_snapshot!(pre_install);
 
         Runtime::set_os("windows".to_string());
         Runtime::set_arch("x64".to_string());
-        let pre_install = run("vfox-nodejs", "20.3.0");
+        let pre_install = run("vfox-nodejs", "20.3.0").await;
         assert_debug_snapshot!(pre_install);
 
         Runtime::reset();
     }
 
-    fn run(plugin: &str, v: &str) -> PreInstall {
+    async fn run(plugin: &str, v: &str) -> PreInstall {
         let p = Plugin::test(plugin);
-        p.pre_install(v).unwrap()
+        p.pre_install(v).await.unwrap()
     }
 }

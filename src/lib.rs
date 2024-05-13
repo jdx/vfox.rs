@@ -2,6 +2,8 @@
 #[macro_use]
 extern crate insta;
 #[macro_use]
+extern crate log;
+#[macro_use]
 extern crate mlua;
 
 pub use error::Result as VfoxResult;
