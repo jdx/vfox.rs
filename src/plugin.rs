@@ -61,7 +61,20 @@ impl Plugin {
         let url = pre_install.url.as_ref().unwrap();
         // TODO: add download_async to xx
         info!("Downloading {url}");
-        xx::http::download(url, "tarball.tar.gz").await?;
+        let file = PathBuf::from("tarball.tar.gz");
+        xx::http::download(url, &file).await?;
+        if let Some(sha256) = &pre_install.sha256 {
+            xx::hash::ensure_checksum_sha256(&file, sha256)?;
+        }
+        if let Some(sha512) = &pre_install.sha512 {
+            xx::hash::ensure_checksum_sha512(&file, sha512)?;
+        }
+        if let Some(_sha1) = &pre_install.sha1 {
+            unimplemented!("sha1")
+        }
+        if let Some(_md5) = &pre_install.md5 {
+            unimplemented!("md5")
+        }
         Ok(())
     }
 

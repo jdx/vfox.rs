@@ -2045,6 +2045,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "sha2"
+version = "0.10.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "793db75ad2bcafc3ffa7c68b215fee268f537982cd901d132f89c6343f3a3dc8"
+dependencies = [
+ "cfg-if",
+ "cpufeatures",
+ "digest",
+]
+
+[[package]]
 name = "shared_child"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2876,18 +2887,20 @@ dependencies = [
 
 [[package]]
 name = "xx"
-version = "1.0.2"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4c55b83ffe30f8b5f8144bd94af5be173d88139310ddfac10e69e24a70a2ffb"
+checksum = "efaea688239772d6026b202103970093681413eac83598589dd30950fa07910b"
 dependencies = [
  "bzip2",
  "duct",
  "filetime",
  "flate2",
+ "homedir",
  "log",
  "miette",
  "regex",
  "reqwest",
+ "sha2",
  "tar",
  "thiserror",
  "tokio",
