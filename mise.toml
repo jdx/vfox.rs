@@ -13,3 +13,7 @@ depends = ['build']
 
 [tasks.ci]
 depends = ["build", "lint", "test"]
+
+[tasks.run]
+depends = ["build"]
+run = "target/debug/vfox-cli"

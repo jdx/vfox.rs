@@ -1,3 +1,3 @@
-mod available;
-mod post_install;
-mod pre_install;
+pub mod available;
+pub mod post_install;
+pub mod pre_install;

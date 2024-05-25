@@ -55,39 +55,6 @@ impl Plugin {
         Ok(plugins)
     }
 
-    pub async fn install(&self, version: &str) -> Result<()> {
-        let pre_install = self.pre_install(version).await?;
-        dbg!(&pre_install);
-        let url = pre_install.url.as_ref().unwrap();
-        // TODO: add download_async to xx
-        info!("Downloading {url}");
-        let file = PathBuf::from("tarball.tar.gz");
-        xx::http::download(url, &file).await?;
-        if let Some(sha256) = &pre_install.sha256 {
-            xx::hash::ensure_checksum_sha256(&file, sha256)?;
-        }
-        if let Some(sha512) = &pre_install.sha512 {
-            xx::hash::ensure_checksum_sha512(&file, sha512)?;
-        }
-        if let Some(_sha1) = &pre_install.sha1 {
-            unimplemented!("sha1")
-        }
-        if let Some(_md5) = &pre_install.md5 {
-            unimplemented!("md5")
-        }
-        Ok(())
-    }
-
-    // TODO: add download_async to xx
-    // pub async fn install_async(&self, version: &str) -> Result<()> {
-    //     let pre_install = self.pre_install_async(version).await?;
-    //     dbg!(&pre_install);
-    //     let url = pre_install.url.as_ref().unwrap();
-    //     info!("Downloading {url}");
-    //     xx::http::download(url, "tarball.tar.gz")?;
-    //     Ok(())
-    // }
-
     #[cfg(test)]
     pub(crate) fn test(name: &str) -> Self {
         let dir = PathBuf::from("plugins").join(name);

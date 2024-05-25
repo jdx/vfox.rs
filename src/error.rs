@@ -17,9 +17,23 @@ pub enum VfoxError {
     ReqwestError(#[from] reqwest::Error),
     #[error(transparent)]
     IoError(#[from] std::io::Error),
+    #[error(transparent)]
+    UrlParseError(#[from] url::ParseError),
 }
 
 pub type Result<T> = std::result::Result<T, VfoxError>;
+
+impl From<String> for VfoxError {
+    fn from(s: String) -> Self {
+        VfoxError::Error(s)
+    }
+}
+
+impl From<&str> for VfoxError {
+    fn from(s: &str) -> Self {
+        VfoxError::Error(s.to_string())
+    }
+}
 
 #[macro_export]
 macro_rules! error {

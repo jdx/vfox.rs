@@ -18,5 +18,6 @@ mod hooks;
 mod lua_mod;
 mod metadata;
 mod plugin;
+mod registry;
 mod runtime;
 mod vfox;
