@@ -40,6 +40,23 @@ impl Vfox {
         sdk.available_async().await
     }
 
+    pub fn list_installed_versions(&self, sdk: &str) -> Result<Vec<SdkInfo>> {
+        let path = self.install_dir.join(sdk);
+        if !path.exists() {
+            return Ok(Default::default());
+        }
+        let versions = xx::file::ls(&path)?;
+        Ok(versions
+            .into_iter()
+            .filter_map(|p| {
+                p.file_name()
+                    .and_then(|f| f.to_str())
+                    .map(|s| s.to_string())
+            })
+            .sorted()
+            .map(|version| SdkInfo::new(sdk.to_string(), version.to_string(), path.join(&version)))
+            .collect())
+    }
     pub fn list_sdks(&self) -> Result<Vec<Plugin>> {
         if !self.plugin_dir.exists() {
             return Ok(Default::default());
@@ -109,7 +126,10 @@ impl Vfox {
         debug!("Getting env keys for {sdk} version {version}");
         let plugin = self.get_sdk(sdk)?;
         let path = self.install_dir.join(sdk).join(version);
-        let sdk_info = BTreeMap::from([(sdk.to_string(), SdkInfo { path: path.clone() })]);
+        let sdk_info = BTreeMap::from([(
+            sdk.to_string(),
+            SdkInfo::new(sdk.to_string(), version.to_string(), path.clone()),
+        )]);
         let ctx = EnvKeysContext {
             version: version.to_string(),
             path,
