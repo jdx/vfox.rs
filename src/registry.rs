@@ -14,3 +14,7 @@ static SDKS: Lazy<BTreeMap<String, Url>> = Lazy::new(|| {
 pub fn sdk_url(name: &str) -> Option<&Url> {
     SDKS.get(name)
 }
+
+pub fn list_sdks() -> &'static BTreeMap<String, Url> {
+    &SDKS
+}

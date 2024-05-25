@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
@@ -23,6 +24,10 @@ pub struct Vfox {
 impl Vfox {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn list_available_sdks() -> &'static BTreeMap<String, Url> {
+        registry::list_sdks()
     }
 
     pub fn list_sdks(&self) -> Result<Vec<Plugin>> {
@@ -51,6 +56,14 @@ impl Vfox {
         if !plugin_dir.exists() {
             let url = registry::sdk_url(sdk).ok_or_else(|| format!("Unknown SDK: {sdk}"))?;
             xx::git::clone(url.as_ref(), &plugin_dir)?;
+        }
+        Ok(())
+    }
+
+    pub fn uninstall_plugin(&self, sdk: &str) -> Result<()> {
+        let plugin_dir = self.plugin_dir.join(sdk);
+        if plugin_dir.exists() {
+            file::remove_dir_all(&plugin_dir)?;
         }
         Ok(())
     }
