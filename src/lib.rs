@@ -20,4 +20,5 @@ mod metadata;
 mod plugin;
 mod registry;
 mod runtime;
+mod sdk_info;
 mod vfox;

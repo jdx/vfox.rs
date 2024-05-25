@@ -7,9 +7,11 @@ use reqwest::Url;
 use xx::file;
 
 use crate::error::Result;
+use crate::hooks::env_keys::{EnvKey, EnvKeysContext};
 use crate::hooks::pre_install::PreInstall;
 use crate::plugin::Plugin;
 use crate::registry;
+use crate::sdk_info::SdkInfo;
 
 #[derive(Debug)]
 pub struct Vfox {
@@ -54,6 +56,7 @@ impl Vfox {
     pub fn install_plugin(&self, sdk: &str) -> Result<()> {
         let plugin_dir = self.plugin_dir.join(sdk);
         if !plugin_dir.exists() {
+            debug!("Installing plugin {sdk}");
             let url = registry::sdk_url(sdk).ok_or_else(|| format!("Unknown SDK: {sdk}"))?;
             xx::git::clone(url.as_ref(), &plugin_dir)?;
         }
@@ -82,6 +85,20 @@ impl Vfox {
         self.verify(&pre_install, &file)?;
         self.extract(&file, install_dir.as_ref())?;
         Ok(())
+    }
+
+    pub async fn env_keys(&self, sdk: &str, version: &str) -> Result<Vec<EnvKey>> {
+        self.install_plugin(sdk)?;
+        debug!("Getting env keys for {sdk} version {version}");
+        let plugin = self.get_sdk(sdk)?;
+        let path = self.install_dir.join(sdk).join(version);
+        let sdk_info = BTreeMap::from([(sdk.to_string(), SdkInfo { path: path.clone() })]);
+        let ctx = EnvKeysContext {
+            version: version.to_string(),
+            path,
+            sdk_info,
+        };
+        plugin.env_keys(ctx).await
     }
 
     async fn download(&self, url: &Url, sdk: &Plugin, version: &str) -> Result<PathBuf> {
@@ -168,4 +185,20 @@ fn home() -> PathBuf {
         .ok()
         .flatten()
         .unwrap_or_else(|| PathBuf::from("/"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_env_keys() {
+        let vfox = Vfox::default();
+        let keys = vfox.env_keys("nodejs", "20.0.0").await.unwrap();
+        let output = format!("{:?}", keys).replace(
+            &vfox.install_dir.to_string_lossy().to_string(),
+            "<INSTALL_DIR>",
+        );
+        assert_snapshot!(output);
+    }
 }
