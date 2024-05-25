@@ -78,14 +78,26 @@ impl Vfox {
         Plugin::from_dir(&self.plugin_dir.join(name))
     }
 
-    pub fn install_plugin(&self, sdk: &str) -> Result<()> {
+    pub fn install_plugin(&self, sdk: &str) -> Result<Plugin> {
+        let plugin_dir = self.plugin_dir.join(sdk);
+        if !plugin_dir.exists() {
+            let url = registry::sdk_url(sdk).ok_or_else(|| format!("Unknown SDK: {sdk}"))?;
+            return self.install_plugin_from_url(url);
+        }
+        Plugin::from_dir(&plugin_dir)
+    }
+
+    pub fn install_plugin_from_url(&self, url: &Url) -> Result<Plugin> {
+        let sdk = url
+            .path_segments()
+            .and_then(|s| s.last())
+            .ok_or("No filename in URL")?;
         let plugin_dir = self.plugin_dir.join(sdk);
         if !plugin_dir.exists() {
             debug!("Installing plugin {sdk}");
-            let url = registry::sdk_url(sdk).ok_or_else(|| format!("Unknown SDK: {sdk}"))?;
             xx::git::clone(url.as_ref(), &plugin_dir)?;
         }
-        Ok(())
+        Plugin::from_dir(&plugin_dir)
     }
 
     pub fn uninstall_plugin(&self, sdk: &str) -> Result<()> {
