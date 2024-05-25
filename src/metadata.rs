@@ -3,29 +3,31 @@ use mlua::Table;
 use crate::error::Result;
 use crate::error::VfoxError;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Metadata {
-    pub _name: String,
-    // pub version: String,
-    // pub description: String,
-    // pub author: String,
-    // pub license: String,
+    pub name: String,
+    pub legacy_filenames: Vec<String>,
+    pub version: String,
+    pub description: Option<String>,
+    pub author: Option<String>,
+    pub license: Option<String>,
+    pub homepage: Option<String>,
 }
 
 impl<'lua> TryFrom<Table<'lua>> for Metadata {
     type Error = VfoxError;
     fn try_from(t: Table<'lua>) -> Result<Self> {
-        let name = t.get::<_, String>("name")?;
-        // let version = t.get::<_, String>("version")?;
-        // let description = t.get::<_, String>("description")?;
-        // let author = t.get::<_, String>("author")?;
-        // let license = t.get::<_, String>("license")?;
+        let legacy_filenames = t
+            .get::<_, Option<Vec<String>>>("legacyFilenames")?
+            .unwrap_or_default();
         Ok(Metadata {
-            _name: name,
-            // version,
-            // description,
-            // author,
-            // license,
+            name: t.get("name")?,
+            legacy_filenames,
+            version: t.get("version")?,
+            description: t.get("description")?,
+            author: t.get("author")?,
+            license: t.get("license")?,
+            homepage: t.get("homepage")?,
         })
     }
 }

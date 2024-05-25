@@ -9,6 +9,7 @@ use xx::file;
 use crate::error::Result;
 use crate::hooks::env_keys::{EnvKey, EnvKeysContext};
 use crate::hooks::pre_install::PreInstall;
+use crate::metadata::Metadata;
 use crate::plugin::Plugin;
 use crate::registry;
 use crate::sdk_info::SdkInfo;
@@ -87,8 +88,17 @@ impl Vfox {
         Ok(())
     }
 
+    pub fn uninstall(&self, sdk: &str, version: &str) -> Result<()> {
+        let path = self.install_dir.join(sdk).join(version);
+        file::remove_dir_all(&path)?;
+        Ok(())
+    }
+
+    pub async fn metadata(&self, sdk: &str) -> Result<Metadata> {
+        self.get_sdk(sdk)?.get_metadata()
+    }
+
     pub async fn env_keys(&self, sdk: &str, version: &str) -> Result<Vec<EnvKey>> {
-        self.install_plugin(sdk)?;
         debug!("Getting env keys for {sdk} version {version}");
         let plugin = self.get_sdk(sdk)?;
         let path = self.install_dir.join(sdk).join(version);
@@ -191,6 +201,19 @@ fn home() -> PathBuf {
 mod tests {
     use super::*;
 
+    impl Vfox {
+        pub fn test() -> Self {
+            Self {
+                runtime_version: "1.0.0".to_string(),
+                plugin_dir: PathBuf::from("plugins"),
+                cache_dir: PathBuf::from("test/cache"),
+                download_dir: PathBuf::from("test/downloads"),
+                install_dir: PathBuf::from("test/installs"),
+                temp_dir: PathBuf::from("test/temp"),
+            }
+        }
+    }
+
     #[tokio::test]
     async fn test_env_keys() {
         let vfox = Vfox::default();
@@ -200,5 +223,47 @@ mod tests {
             "<INSTALL_DIR>",
         );
         assert_snapshot!(output);
+    }
+
+    #[tokio::test]
+    async fn test_install_plugin() {
+        let vfox = Vfox::test();
+        vfox.uninstall_plugin("nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("nodejs").exists());
+        vfox.install_plugin("nodejs").unwrap();
+        assert!(vfox.plugin_dir.join("nodejs").exists());
+        vfox.uninstall_plugin("nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("nodejs").exists());
+    }
+
+    #[tokio::test]
+    async fn test_install() {
+        let vfox = Vfox::test();
+        let install_dir = vfox.install_dir.join("nodejs").join("20.0.0");
+        vfox.install("nodejs", "20.0.0", &install_dir)
+            .await
+            .unwrap();
+        assert!(vfox
+            .install_dir
+            .join("nodejs")
+            .join("20.0.0")
+            .join("bin")
+            .join("node")
+            .exists());
+        vfox.uninstall_plugin("nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("nodejs").exists());
+        vfox.uninstall("nodejs", "20.0.0").unwrap();
+        assert!(!vfox.install_dir.join("nodejs").join("20.0.0").exists());
+        file::remove_dir_all(vfox.plugin_dir.join("nodejs")).unwrap();
+        file::remove_dir_all(vfox.install_dir).unwrap();
+        file::remove_dir_all(vfox.download_dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_metadata() {
+        let vfox = Vfox::test();
+        let metadata = vfox.metadata("vfox-nodejs").await.unwrap();
+        let out = format!("{:?}", metadata);
+        assert_snapshot!(out);
     }
 }

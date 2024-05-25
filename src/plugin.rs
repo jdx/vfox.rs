@@ -55,6 +55,10 @@ impl Plugin {
         Ok(plugins)
     }
 
+    pub fn get_metadata(&self) -> Result<Metadata> {
+        Ok(self.load()?.clone())
+    }
+
     #[cfg(test)]
     pub(crate) fn test(name: &str) -> Self {
         let dir = PathBuf::from("plugins").join(name);
@@ -95,6 +99,7 @@ impl Plugin {
 
     fn load(&self) -> Result<&Metadata> {
         self.metadata.get_or_try_init(|| {
+            debug!("Getting metadata for {self}");
             set_paths(
                 &self.lua,
                 &[
@@ -179,15 +184,5 @@ impl PartialOrd for Plugin {
 impl Ord for Plugin {
     fn cmp(&self, other: &Self) -> Ordering {
         self.name.cmp(&other.name)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn list() {
-        Plugin::list().unwrap();
     }
 }
