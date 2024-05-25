@@ -20,15 +20,24 @@ pub struct Plugin {
     metadata: OnceCell<Metadata>,
 }
 
+#[derive(Debug)]
+pub struct AppData {
+    pub(crate) plugin_dir: PathBuf,
+}
+
 impl Plugin {
     pub fn from_dir(dir: &Path) -> Result<Self> {
         if !dir.exists() {
             error!("Plugin directory not found: {:?}", dir);
         }
+        let lua = Lua::new();
+        lua.set_app_data(AppData {
+            plugin_dir: dir.to_path_buf(),
+        });
         Ok(Self {
             name: dir.file_name().unwrap().to_string_lossy().to_string(),
             dir: dir.to_path_buf(),
-            lua: Lua::new(),
+            lua,
             metadata: OnceCell::new(),
         })
     }

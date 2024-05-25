@@ -7,7 +7,9 @@ use reqwest::Url;
 use xx::file;
 
 use crate::error::Result;
+use crate::hooks::available::AvailableVersion;
 use crate::hooks::env_keys::{EnvKey, EnvKeysContext};
+use crate::hooks::parse_legacy_file::ParseLegacyFileResponse;
 use crate::hooks::pre_install::PreInstall;
 use crate::metadata::Metadata;
 use crate::plugin::Plugin;
@@ -31,6 +33,11 @@ impl Vfox {
 
     pub fn list_available_sdks() -> &'static BTreeMap<String, Url> {
         registry::list_sdks()
+    }
+
+    pub async fn list_available_versions(&self, sdk: &str) -> Result<Vec<AvailableVersion>> {
+        let sdk = self.get_sdk(sdk)?;
+        sdk.available_async().await
     }
 
     pub fn list_sdks(&self) -> Result<Vec<Plugin>> {
@@ -109,6 +116,15 @@ impl Vfox {
             sdk_info,
         };
         plugin.env_keys(ctx).await
+    }
+
+    pub async fn parse_legacy_file(
+        &self,
+        sdk: &str,
+        file: &Path,
+    ) -> Result<ParseLegacyFileResponse> {
+        let sdk = self.get_sdk(sdk)?;
+        sdk.parse_legacy_file(file).await
     }
 
     async fn download(&self, url: &Url, sdk: &Plugin, version: &str) -> Result<PathBuf> {
