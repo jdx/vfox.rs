@@ -1,5 +1,10 @@
 use crate::error::Result;
 use mlua::{ExternalResult, Lua, MultiValue, Table};
+#[cfg(windows)]
+use std::os::windows::fs::symlink_dir;
+#[cfg(windows)]
+use std::os::windows::fs::symlink_file;
+#[cfg(unix)]
 use std::os::unix::fs::symlink as _symlink;
 use std::path::Path;
 
@@ -19,6 +24,15 @@ async fn symlink<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> mlua::Result
         .collect::<mlua::Result<_>>()?;
     let src = Path::new(&input[0]);
     let dst = Path::new(&input[1]);
+    #[cfg(windows)]
+    {
+        if src.is_dir() {
+            symlink_dir(src, dst).into_lua_err()?;
+        } else {
+            symlink_file(src, dst).into_lua_err()?;
+        }
+    }
+    #[cfg(unix)]
     _symlink(src, dst).into_lua_err()?;
     Ok(())
 }
