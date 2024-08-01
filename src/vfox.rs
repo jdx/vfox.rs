@@ -239,7 +239,7 @@ impl Default for Vfox {
 }
 
 fn home() -> PathBuf {
-    homedir::get_my_home()
+    homedir::my_home()
         .ok()
         .flatten()
         .unwrap_or_else(|| PathBuf::from("/"))

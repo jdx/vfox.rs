@@ -17,7 +17,7 @@ name = "vfox-cli"
 path = "src/bin.rs"
 
 [dependencies]
-homedir = "0.2.1"
+homedir = "0.3"
 itertools = "0.13"
 log = "0.4.21"
 mlua = { version = "0.9", features = ["async", "lua54", "macros", "serialize", "vendored"] }

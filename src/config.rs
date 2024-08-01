@@ -17,7 +17,7 @@ impl Config {
     fn _get() -> MutexGuard<'static, Option<Config>> {
         let mut config = CONFIG.lock().unwrap();
         if config.is_none() {
-            let home = homedir::get_my_home()
+            let home = homedir::my_home()
                 .ok()
                 .flatten()
                 .unwrap_or_else(|| PathBuf::from("/"));
