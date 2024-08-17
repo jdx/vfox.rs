@@ -13,6 +13,9 @@ on:
 concurrency:
   group: release-plz
 
+env:
+  DRY_RUN: 0
+
 jobs:
   release-plz:
     runs-on: ubuntu-latest

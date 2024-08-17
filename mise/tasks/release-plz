@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # shellcheck shell=bash
 set -euxo pipefail
 
@@ -6,7 +6,7 @@ released_versions="$(git tag --list | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-
 cur_version="$(cargo pkgid vfox | cut -d# -f2 | cut -d@ -f2)"
 if ! echo "$released_versions" | grep -q "^v$cur_version$"; then
   echo "Releasing $cur_version"
-  if [ "${vfox_dry_run:-}" != 1 ]; then
+  if [ "${DRY_RUN:-}" == 0 ]; then
     cargo publish -p vfox
     changelog="$(git cliff --tag "v$cur_version" --strip all --unreleased)"
     git tag "v$cur_version"
@@ -19,7 +19,7 @@ fi
 version="$(git cliff --bumped-version)"
 changelog="$(git cliff --bump --unreleased --strip all)"
 
-if [ "${vfox_dry_run:-}" == 1 ]; then
+if [ "${DRY_RUN:-}" != 0 ]; then
   echo "version: $version"
   echo "changelog: $changelog"
   exit 0
