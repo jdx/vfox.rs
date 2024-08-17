@@ -32,7 +32,7 @@ git config user.name mise-en-dev
 git config user.email 123107610+mise-en-dev@users.noreply.github.com
 cargo update
 git add \
-  {./,cli/,lib/}Cargo.* \
+  Cargo.* \
   CHANGELOG.md
 git checkout -B release
 git commit -m "chore: release $version"
