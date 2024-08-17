@@ -20,7 +20,7 @@ function PLUGIN:PreInstall(ctx)
     end
 
     if (version == nil) then
-        error("version not found for provided version " .. version)
+        error("version not found for provided version " .. (ctx.version or "null"))
     end
 
     local arch_type = RUNTIME.archType

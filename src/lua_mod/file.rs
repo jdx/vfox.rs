@@ -1,11 +1,11 @@
 use crate::error::Result;
 use mlua::{ExternalResult, Lua, MultiValue, Table};
+#[cfg(unix)]
+use std::os::unix::fs::symlink as _symlink;
 #[cfg(windows)]
 use std::os::windows::fs::symlink_dir;
 #[cfg(windows)]
 use std::os::windows::fs::symlink_file;
-#[cfg(unix)]
-use std::os::unix::fs::symlink as _symlink;
 use std::path::Path;
 
 pub fn mod_file(lua: &Lua) -> Result<()> {

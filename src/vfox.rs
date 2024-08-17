@@ -276,33 +276,31 @@ mod tests {
     #[tokio::test]
     async fn test_install_plugin() {
         let vfox = Vfox::test();
-        vfox.uninstall_plugin("nodejs").unwrap();
-        assert!(!vfox.plugin_dir.join("nodejs").exists());
-        vfox.install_plugin("nodejs").unwrap();
-        assert!(vfox.plugin_dir.join("nodejs").exists());
-        vfox.uninstall_plugin("nodejs").unwrap();
-        assert!(!vfox.plugin_dir.join("nodejs").exists());
+        vfox.uninstall_plugin("vfox-nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("vfox-nodejs").exists());
+        vfox.install_plugin("vfox-nodejs").unwrap();
+        assert!(vfox.plugin_dir.join("vfox-nodejs").exists());
     }
 
     #[tokio::test]
     async fn test_install() {
         let vfox = Vfox::test();
-        let install_dir = vfox.install_dir.join("nodejs").join("20.0.0");
-        vfox.install("nodejs", "20.0.0", &install_dir)
+        let install_dir = vfox.install_dir.join("vfox-nodejs").join("20.0.0");
+        vfox.install("vfox-nodejs", "20.0.0", &install_dir)
             .await
             .unwrap();
         assert!(vfox
             .install_dir
-            .join("nodejs")
+            .join("vfox-nodejs")
             .join("20.0.0")
             .join("bin")
             .join("node")
             .exists());
-        vfox.uninstall_plugin("nodejs").unwrap();
-        assert!(!vfox.plugin_dir.join("nodejs").exists());
-        vfox.uninstall("nodejs", "20.0.0").unwrap();
-        assert!(!vfox.install_dir.join("nodejs").join("20.0.0").exists());
-        file::remove_dir_all(vfox.plugin_dir.join("nodejs")).unwrap();
+        vfox.uninstall_plugin("vfox-nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("vfox-nodejs").exists());
+        vfox.uninstall("vfox-nodejs", "20.0.0").unwrap();
+        assert!(!vfox.install_dir.join("vfox-nodejs").join("20.0.0").exists());
+        file::remove_dir_all(vfox.plugin_dir.join("vfox-nodejs")).unwrap();
         file::remove_dir_all(vfox.install_dir).unwrap();
         file::remove_dir_all(vfox.download_dir).unwrap();
     }
