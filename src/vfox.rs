@@ -264,7 +264,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_env_keys() {
-        let vfox = Vfox::default();
+        let vfox = Vfox::test();
+        vfox.install_plugin("nodejs").unwrap();
         let keys = vfox.env_keys("nodejs", "20.0.0").await.unwrap();
         let output = format!("{:?}", keys).replace(
             &vfox.install_dir.to_string_lossy().to_string(),
@@ -276,31 +277,31 @@ mod tests {
     #[tokio::test]
     async fn test_install_plugin() {
         let vfox = Vfox::test();
-        vfox.uninstall_plugin("vfox-nodejs").unwrap();
-        assert!(!vfox.plugin_dir.join("vfox-nodejs").exists());
-        vfox.install_plugin("vfox-nodejs").unwrap();
-        assert!(vfox.plugin_dir.join("vfox-nodejs").exists());
+        vfox.uninstall_plugin("nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("nodejs").exists());
+        vfox.install_plugin("nodejs").unwrap();
+        assert!(vfox.plugin_dir.join("nodejs").exists());
     }
 
     #[tokio::test]
     async fn test_install() {
         let vfox = Vfox::test();
-        let install_dir = vfox.install_dir.join("vfox-nodejs").join("20.0.0");
-        vfox.install("vfox-nodejs", "20.0.0", &install_dir)
+        let install_dir = vfox.install_dir.join("nodejs").join("20.0.0");
+        vfox.install("nodejs", "20.0.0", &install_dir)
             .await
             .unwrap();
         assert!(vfox
             .install_dir
-            .join("vfox-nodejs")
+            .join("nodejs")
             .join("20.0.0")
             .join("bin")
             .join("node")
             .exists());
-        vfox.uninstall_plugin("vfox-nodejs").unwrap();
-        assert!(!vfox.plugin_dir.join("vfox-nodejs").exists());
-        vfox.uninstall("vfox-nodejs", "20.0.0").unwrap();
-        assert!(!vfox.install_dir.join("vfox-nodejs").join("20.0.0").exists());
-        file::remove_dir_all(vfox.plugin_dir.join("vfox-nodejs")).unwrap();
+        vfox.uninstall_plugin("nodejs").unwrap();
+        assert!(!vfox.plugin_dir.join("nodejs").exists());
+        vfox.uninstall("nodejs", "20.0.0").unwrap();
+        assert!(!vfox.install_dir.join("nodejs").join("20.0.0").exists());
+        file::remove_dir_all(vfox.plugin_dir.join("nodejs")).unwrap();
         file::remove_dir_all(vfox.install_dir).unwrap();
         file::remove_dir_all(vfox.download_dir).unwrap();
     }
@@ -308,7 +309,7 @@ mod tests {
     #[tokio::test]
     async fn test_metadata() {
         let vfox = Vfox::test();
-        let metadata = vfox.metadata("vfox-nodejs").await.unwrap();
+        let metadata = vfox.metadata("nodejs").await.unwrap();
         let out = format!("{:?}", metadata);
         assert_snapshot!(out);
     }

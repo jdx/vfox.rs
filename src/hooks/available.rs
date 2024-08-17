@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn dummy() {
-        let versions = run("vfox-dummy");
+        let versions = run("dummy");
         assert_debug_snapshot!(versions, @r###"
         [
             "1.0.0",
@@ -64,7 +64,7 @@ mod tests {
 
     #[tokio::test]
     async fn dummy_async() {
-        let versions = run_async("vfox-dummy").await;
+        let versions = run_async("dummy").await;
         assert_debug_snapshot!(versions, @r###"
         [
             "1.0.0",
@@ -75,7 +75,7 @@ mod tests {
 
     #[tokio::test]
     async fn nodejs_async() {
-        let versions = run_async("vfox-nodejs").await;
+        let versions = run_async("nodejs").await;
         assert!(versions.contains(&"20.0.0".to_string()));
     }
 

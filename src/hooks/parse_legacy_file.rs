@@ -75,7 +75,7 @@ mod tests {
     async fn test_parse_legacy_file_nodejs() {
         let vfox = Vfox::test();
         let response = vfox
-            .parse_legacy_file("vfox-nodejs", Path::new("test/data/.node-version"))
+            .parse_legacy_file("nodejs", Path::new("test/data/.node-version"))
             .await
             .unwrap();
         let out = format!("{:?}", response);

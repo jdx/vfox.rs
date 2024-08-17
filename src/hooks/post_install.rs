@@ -41,7 +41,7 @@ mod tests {
 
     #[test]
     fn dummy() {
-        let p = Plugin::test("vfox-dummy");
+        let p = Plugin::test("dummy");
         let ctx = PostInstallContext {
             root_path: "/tmp".to_string(),
         };

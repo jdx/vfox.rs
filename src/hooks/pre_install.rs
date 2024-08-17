@@ -60,7 +60,7 @@ mod tests {
 
     #[test]
     async fn dummy() {
-        let pre_install = run("vfox-dummy", "1.0.1").await;
+        let pre_install = run("dummy", "1.0.1").await;
         assert_debug_snapshot!(pre_install);
     }
 
@@ -68,17 +68,17 @@ mod tests {
     async fn nodejs() {
         Runtime::set_os("linux".to_string());
         Runtime::set_arch("x64".to_string());
-        let pre_install = run("vfox-nodejs", "20.0.0").await;
+        let pre_install = run("nodejs", "20.0.0").await;
         assert_debug_snapshot!(pre_install);
 
         Runtime::set_os("macos".to_string());
         Runtime::set_arch("arm64".to_string());
-        let pre_install = run("vfox-nodejs", "20.1.0").await;
+        let pre_install = run("nodejs", "20.1.0").await;
         assert_debug_snapshot!(pre_install);
 
         Runtime::set_os("windows".to_string());
         Runtime::set_arch("x64".to_string());
-        let pre_install = run("vfox-nodejs", "20.3.0").await;
+        let pre_install = run("nodejs", "20.3.0").await;
         assert_debug_snapshot!(pre_install);
 
         Runtime::reset();
