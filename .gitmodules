@@ -1,0 +1,3 @@
+[submodule "plugins/nodejs"]
+	path = plugins/nodejs
+	url = https://github.com/version-fox/vfox-nodejs
