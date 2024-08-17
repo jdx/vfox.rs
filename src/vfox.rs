@@ -90,9 +90,15 @@ impl Vfox {
     pub fn install_plugin_from_url(&self, url: &Url) -> Result<Plugin> {
         let sdk = url
             .path_segments()
-            .and_then(|s| s.last())
+            .and_then(|s| {
+                let filename = s.last().unwrap();
+                filename
+                    .strip_prefix("vfox-")
+                    .map(|s| s.to_string())
+                    .or_else(|| Some(filename.to_string()))
+            })
             .ok_or("No filename in URL")?;
-        let plugin_dir = self.plugin_dir.join(sdk);
+        let plugin_dir = self.plugin_dir.join(&sdk);
         if !plugin_dir.exists() {
             debug!("Installing plugin {sdk}");
             xx::git::clone(url.as_ref(), &plugin_dir)?;
