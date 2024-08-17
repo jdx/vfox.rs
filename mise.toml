@@ -1,19 +1,13 @@
-tasks.build = "cargo build --all --all-features"
-tasks.build-release = "cargo build --all --all-features --release"
-tasks.format = "cargo fmt -- --all"
-tasks.lint = [
-  "cargo clippy --all --all-features -- -D warnings",
-  "cargo fmt --all -- --check",
-]
-tasks.release = "cargo release"
+[tools]
+"cargo:cargo-edit" = "latest"
+"cargo:git-cliff" = "latest"
+"npm:prettier" = "latest"
 
-[tasks.test]
-run = "cargo test --all --all-features"
-depends = ['build']
-
-[tasks.ci]
-depends = ["build", "lint", "test"]
-
-[tasks.run]
-depends = ["build"]
-run = "target/debug/vfox-cli"
+[tasks.lint]
+depends = ['lint:*']
+[tasks."lint:prettier"]
+run = "prettier -c ."
+[tasks."lint:clippy"]
+run = 'cargo clippy --all --all-features -- -D warnings'
+[tasks."lint:fmt"]
+run = 'cargo fmt --all -- --check'
