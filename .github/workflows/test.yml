@@ -15,6 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test
-      - run: cargo build
-      - run: cargo clippy -- -Dwarnings
+      - uses: jdx/mise-action@v2
+        with:
+          experimental: true
+      - run: mise run build
+      - run: mise run lint
+      - run: mise run test

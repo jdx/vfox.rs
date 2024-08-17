@@ -3,6 +3,10 @@
 "cargo:git-cliff" = "latest"
 "npm:prettier" = "latest"
 
+[tasks.build]
+run = "cargo build"
+[tasks.test]
+run = "cargo test"
 [tasks.lint]
 depends = ['lint:*']
 [tasks."lint:prettier"]
