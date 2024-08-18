@@ -144,14 +144,13 @@ impl Vfox {
         debug!("Getting env keys for {sdk} version {version}");
         let plugin = self.get_sdk(sdk)?;
         let path = self.install_dir.join(sdk).join(version);
-        let sdk_info = BTreeMap::from([(
-            sdk.to_string(),
-            SdkInfo::new(sdk.to_string(), version.to_string(), path.clone()),
-        )]);
+        let sdk_info = SdkInfo::new(sdk.to_string(), version.to_string(), path.clone());
         let ctx = EnvKeysContext {
+            args: vec![],
             version: version.to_string(),
             path,
-            sdk_info,
+            sdk_info: BTreeMap::from([(sdk.to_string(), sdk_info.clone())]),
+            main: sdk_info,
         };
         plugin.env_keys(ctx).await
     }
@@ -204,7 +203,7 @@ impl Vfox {
         file::remove_dir_all(install_dir)?;
         let move_to_install = || {
             let subdirs = file::ls(&tmp)?;
-            if subdirs.len() == 1 {
+            if subdirs.len() == 1 && subdirs.first().unwrap().is_dir() {
                 let subdir = subdirs.first().unwrap();
                 file::mv(subdir, install_dir)?;
                 file::remove_dir_all(&tmp)?;

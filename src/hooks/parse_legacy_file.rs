@@ -8,6 +8,7 @@ use crate::Plugin;
 
 #[derive(Debug)]
 pub struct LegacyFileContext {
+    pub args: Vec<String>,
     pub filepath: PathBuf,
 }
 
@@ -18,7 +19,9 @@ pub struct ParseLegacyFileResponse {
 
 impl Plugin {
     pub async fn parse_legacy_file(&self, legacy_file: &Path) -> Result<ParseLegacyFileResponse> {
+        debug!("[vfox:{}] parse_legacy_file", &self.name);
         let ctx = LegacyFileContext {
+            args: vec![],
             filepath: legacy_file.to_path_buf(),
         };
         let legacy_file_response = self
@@ -36,6 +39,7 @@ impl Plugin {
 impl<'lua> IntoLua<'lua> for LegacyFileContext {
     fn into_lua(self, lua: &'lua Lua) -> mlua::Result<Value<'lua>> {
         let table = lua.create_table()?;
+        table.set("args", self.args)?;
         table.set("filepath", self.filepath.to_string_lossy().to_string())?;
         table.set(
             "getInstalledVersions",

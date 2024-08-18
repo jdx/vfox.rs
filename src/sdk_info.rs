@@ -1,7 +1,7 @@
 use mlua::{IntoLua, Lua, Value};
 use std::path::PathBuf;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SdkInfo {
     pub name: String,
     pub version: String,

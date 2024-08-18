@@ -6,6 +6,7 @@ use crate::Plugin;
 
 impl Plugin {
     pub async fn pre_install(&self, version: &str) -> Result<PreInstall> {
+        debug!("[vfox:{}] pre_install", &self.name);
         let ctx = self.context(Some(version.to_string()))?;
         let pre_install = self
             .eval_async(chunk! {

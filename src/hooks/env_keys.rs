@@ -15,13 +15,16 @@ pub struct EnvKey {
 
 #[derive(Debug)]
 pub struct EnvKeysContext {
+    pub args: Vec<String>,
     pub version: String,
     pub path: PathBuf,
+    pub main: SdkInfo,
     pub sdk_info: BTreeMap<String, SdkInfo>,
 }
 
 impl Plugin {
     pub async fn env_keys(&self, ctx: EnvKeysContext) -> Result<Vec<EnvKey>> {
+        debug!("[vfox:{}] env_keys", &self.name);
         let env_keys = self
             .eval_async(chunk! {
                 require "hooks/env_keys"
@@ -42,7 +45,8 @@ impl<'lua> IntoLua<'lua> for EnvKeysContext {
         for (k, v) in self.sdk_info {
             sdk_info.set(k, v)?;
         }
-        table.set("sdk_info", sdk_info)?;
+        table.set("sdkInfo", sdk_info)?;
+        table.set("main", self.main)?;
         Ok(Value::Table(table))
     }
 }

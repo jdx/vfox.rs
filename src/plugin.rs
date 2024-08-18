@@ -76,6 +76,7 @@ impl Plugin {
 
     pub(crate) fn context(&self, version: Option<String>) -> Result<Context> {
         let ctx = Context {
+            args: vec![],
             version,
             // version: "1.0.0".to_string(),
             // runtime_version: "xxx".to_string(),
