@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2](https://github.com/jdx/vfox.rs/compare/v0.1.1..v0.1.2) - 2024-08-18
+
+### 🐛 Bug Fixes
+
+- working with more plugins by [@jdx](https://github.com/jdx) in [8c37c7c](https://github.com/jdx/vfox.rs/commit/8c37c7c2f8e40c448cc25618b566c533c8d66f2d)
+
 ## [0.1.1](https://github.com/jdx/vfox.rs/compare/v0.1.0..v0.1.1) - 2024-08-18
 
 ### 🐛 Bug Fixes
