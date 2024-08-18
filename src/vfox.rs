@@ -223,7 +223,8 @@ impl Vfox {
             xx::archive::untar_bz2(file, &tmp)?;
             move_to_install()?;
         } else if filename.ends_with(".zip") {
-            xx::archive::unzip(file, install_dir)?;
+            xx::archive::unzip(file, &tmp)?;
+            move_to_install()?;
         } else {
             unimplemented!("Unsupported extension {file:?}");
         }

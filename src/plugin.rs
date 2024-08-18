@@ -129,6 +129,8 @@ impl Plugin {
             self.set_global("PLUGIN", metadata.clone())?;
             self.set_global("RUNTIME", Runtime::get())?;
 
+            lua_mod::hooks(&self.lua, &self.dir)?;
+
             metadata.try_into()
         })
     }
