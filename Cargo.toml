@@ -34,6 +34,7 @@ xx = { version = "1", features = ["archive", "hash", "http"] }
 # cli dependencies
 env_logger = { version = "0.11", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
+serde = { version = "1.0.208", features = ["derive"] }
 
 [dev-dependencies]
 insta = "1"
