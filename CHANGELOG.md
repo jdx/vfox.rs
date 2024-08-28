@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.3](https://github.com/jdx/vfox.rs/compare/v0.1.2..v0.1.3) - 2024-08-28
+
+### 🐛 Bug Fixes
+
+- amd64 arch by [@jdx](https://github.com/jdx) in [05a8885](https://github.com/jdx/vfox.rs/commit/05a88857583171acf11746a270399b8a7c263551)
+
+### 🔍 Other Changes
+
+- enable release-plz workflow button by [@jdx](https://github.com/jdx) in [302c970](https://github.com/jdx/vfox.rs/commit/302c970871706207107b6c84ce7849a1cc854b4b)
+
+### 📦️ Dependency Updates
+
+- update rust crate xx to v1.1.8 by [@renovate[bot]](https://github.com/renovate[bot]) in [#32](https://github.com/jdx/vfox.rs/pull/32)
+- update rust crate serde_json to v1.0.127 by [@renovate[bot]](https://github.com/renovate[bot]) in [#25](https://github.com/jdx/vfox.rs/pull/25)
+- update rust crate reqwest to v0.12.7 by [@renovate[bot]](https://github.com/renovate[bot]) in [#34](https://github.com/jdx/vfox.rs/pull/34)
+
 ## [0.1.2](https://github.com/jdx/vfox.rs/compare/v0.1.1..v0.1.2) - 2024-08-18
 
 ### 🐛 Bug Fixes
