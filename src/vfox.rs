@@ -313,6 +313,28 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_install_cmake() {
+        let vfox = Vfox::test();
+        vfox.install_plugin("cmake").unwrap();
+        let install_dir = vfox.install_dir.join("cmake").join("3.21.0");
+        vfox.install("cmake", "3.21.0", &install_dir).await.unwrap();
+        assert!(vfox
+            .install_dir
+            .join("cmake")
+            .join("3.21.0")
+            .join("bin")
+            .join("cmake")
+            .exists());
+        vfox.uninstall_plugin("cmake").unwrap();
+        assert!(!vfox.plugin_dir.join("cmake").exists());
+        vfox.uninstall("cmake", "3.21.0").unwrap();
+        assert!(!vfox.install_dir.join("cmake").join("3.21.0").exists());
+        file::remove_dir_all(vfox.plugin_dir.join("cmake")).unwrap();
+        file::remove_dir_all(vfox.install_dir).unwrap();
+        file::remove_dir_all(vfox.download_dir).unwrap();
+    }
+
+    #[tokio::test]
     async fn test_metadata() {
         let vfox = Vfox::test();
         let metadata = vfox.metadata("nodejs").await.unwrap();

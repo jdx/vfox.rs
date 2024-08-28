@@ -65,7 +65,7 @@ fn os() -> String {
 fn arch() -> String {
     match ARCH {
         "aarch64" => "arm64".to_string(),
-        "x86_64" => "x64".to_string(),
+        "x86_64" => "amd64".to_string(),
         arch => arch.to_string(),
     }
 }
