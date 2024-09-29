@@ -5,6 +5,7 @@ use crate::error::Result;
 use crate::Plugin;
 
 impl Plugin {
+    #[allow(clippy::needless_return)] // seems to be a clippy bug
     #[tokio::main(flavor = "current_thread")]
     pub async fn available(&self) -> Result<Vec<AvailableVersion>> {
         self.available_async().await

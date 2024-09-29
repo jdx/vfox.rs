@@ -7,6 +7,8 @@
 run = "cargo build"
 [tasks.test]
 run = "cargo test"
+[tasks.lint-fix]
+run = "cargo fmt --all && cargo clippy --fix --all --all-features --allow-dirty -- -D warnings"
 [tasks.lint]
 depends = ['lint:*']
 [tasks."lint:prettier"]

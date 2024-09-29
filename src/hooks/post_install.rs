@@ -6,6 +6,7 @@ use crate::Plugin;
 
 impl Plugin {
     #[tokio::main(flavor = "current_thread")]
+    #[allow(clippy::needless_return)]
     pub async fn post_install(&self, ctx: PostInstallContext) -> Result<()> {
         self.post_install_async(ctx).await
     }

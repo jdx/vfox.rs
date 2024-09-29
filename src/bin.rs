@@ -5,6 +5,7 @@ extern crate log;
 #[cfg(feature = "cli")]
 mod cli;
 
+#[allow(clippy::needless_return)]
 #[cfg(feature = "cli")]
 #[tokio::main]
 async fn main() {
