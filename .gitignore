@@ -1,1 +1,4 @@
 /target
+/plugins/cmake
+/test/downloads
+/test/installs
