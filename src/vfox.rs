@@ -123,6 +123,7 @@ impl Vfox {
         self.install_plugin(sdk)?;
         let sdk = self.get_sdk(sdk)?;
         let pre_install = sdk.pre_install(version).await?;
+        trace!("{:?}", pre_install);
         let url = Url::from_str(pre_install.url.as_ref().unwrap())?;
         let file = self.download(&url, &sdk, version).await?;
         self.verify(&pre_install, &file)?;

@@ -35,6 +35,13 @@ impl<'lua> FromLua<'lua> for PreInstall {
     fn from_lua(value: Value<'lua>, _: &'lua Lua) -> std::result::Result<Self, LuaError> {
         match value {
             Value::Table(table) => {
+                if !table.contains_key("version")? {
+                    return Err(LuaError::FromLuaConversionError {
+                        from: "table",
+                        to: "PreInstall",
+                        message: Some("no version returned from vfox plugin".to_string()),
+                    });
+                }
                 Ok(PreInstall {
                     version: table.get::<_, String>("version")?,
                     url: table.get::<_, Option<String>>("url")?,
