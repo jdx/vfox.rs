@@ -226,7 +226,8 @@ impl Vfox {
             xx::archive::unzip(file, &tmp)?;
             move_to_install()?;
         } else {
-            unimplemented!("Unsupported extension {file:?}");
+            file::mv(file, install_dir.join(&filename))?;
+            file::make_executable(install_dir.join(&filename))?;
         }
         Ok(())
     }
@@ -319,13 +320,33 @@ mod tests {
         vfox.install_plugin("cmake").unwrap();
         let install_dir = vfox.install_dir.join("cmake").join("3.21.0");
         vfox.install("cmake", "3.21.0", &install_dir).await.unwrap();
-        assert!(vfox
-            .install_dir
-            .join("cmake")
-            .join("3.21.0")
-            .join("bin")
-            .join("cmake")
-            .exists());
+        if cfg!(target_os = "linux") {
+            assert!(vfox
+                .install_dir
+                .join("cmake")
+                .join("3.21.0")
+                .join("bin")
+                .join("cmake")
+                .exists());
+        } else if cfg!(target_os = "macos") {
+            assert!(vfox
+                .install_dir
+                .join("cmake")
+                .join("3.21.0")
+                .join("CMake.app")
+                .join("Contents")
+                .join("bin")
+                .join("cmake")
+                .exists());
+        } else if cfg!(target_os = "windows") {
+            assert!(vfox
+                .install_dir
+                .join("cmake")
+                .join("3.21.0")
+                .join("bin")
+                .join("cmake.exe")
+                .exists());
+        }
         vfox.uninstall_plugin("cmake").unwrap();
         assert!(!vfox.plugin_dir.join("cmake").exists());
         vfox.uninstall("cmake", "3.21.0").unwrap();
