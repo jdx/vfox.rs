@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.1.4](https://github.com/jdx/vfox.rs/compare/v0.1.3..v0.1.4) - 2024-10-14
+
+### 🐛 Bug Fixes
+
+- clippy bug by [@jdx](https://github.com/jdx) in [3bfe31e](https://github.com/jdx/vfox.rs/commit/3bfe31e0f8e1690d3ad6bf6f62bed9c773927ae9)
+- make installs without archives work by [@jdx](https://github.com/jdx) in [15a7bad](https://github.com/jdx/vfox.rs/commit/15a7badcdf7a0b95d31d4e7366ef2a39abba53f9)
+
+### 📚 Documentation
+
+- use dashes in CHANGELOG by [@jdx](https://github.com/jdx) in [dacfe24](https://github.com/jdx/vfox.rs/commit/dacfe2465745aee8b0369e652a41c92f2e062ff5)
+
+### 🔍 Other Changes
+
+- migrate away from deprecated git-cliff syntax by [@jdx](https://github.com/jdx) in [49f9f6f](https://github.com/jdx/vfox.rs/commit/49f9f6f1b27f85f5f5aef100430d149c3782dbb1)
+- added some gitignores by [@jdx](https://github.com/jdx) in [7ec0306](https://github.com/jdx/vfox.rs/commit/7ec03064bcc169d34a4cad7dd5b63e257a6c3672)
+- added extra logging info by [@jdx](https://github.com/jdx) in [0643f92](https://github.com/jdx/vfox.rs/commit/0643f9205cc851eb3f6d258c79cabdf2153acdf5)
+
+### 📦️ Dependency Updates
+
+- update rust crate clap to v4.5.18 by [@renovate[bot]](https://github.com/renovate[bot]) in [#35](https://github.com/jdx/vfox.rs/pull/35)
+- update rust crate serde_json to v1.0.128 by [@renovate[bot]](https://github.com/renovate[bot]) in [#36](https://github.com/jdx/vfox.rs/pull/36)
+- update rust crate once_cell to v1.20.1 by [@renovate[bot]](https://github.com/renovate[bot]) in [#38](https://github.com/jdx/vfox.rs/pull/38)
+- update rust crate clap to v4.5.20 by [@renovate[bot]](https://github.com/renovate[bot]) in [#39](https://github.com/jdx/vfox.rs/pull/39)
+- update rust crate homedir to v0.3.4 by [@renovate[bot]](https://github.com/renovate[bot]) in [#40](https://github.com/jdx/vfox.rs/pull/40)
+
 ## [0.1.3](https://github.com/jdx/vfox.rs/compare/v0.1.2..v0.1.3) - 2024-08-28
 
 ### 🐛 Bug Fixes
