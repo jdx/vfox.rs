@@ -4,9 +4,9 @@
 
 ### 🐛 Bug Fixes
 
-- windows bug by [@jdx](https://github.com/jdx) in [a1ff24a](https://github.com/jdx/vfox.rs/commit/a1ff24aff5fb16582011a8e0db0aa2d436780524)
+- hide logs by default by [@jdx](https://github.com/jdx) in [19d1ddd](https://github.com/jdx/vfox.rs/commit/19d1dddfc7302978ead7dfd5aadcffaa6d60fb3e)
 
-## [0.1.4](https://github.com/jdx/vfox.rs/compare/v0.1.3..v0.1.4) - 2024-10-14
+## [0.1.4] - 2024-10-14
 
 ### 🐛 Bug Fixes
 
