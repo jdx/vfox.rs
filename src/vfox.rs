@@ -1,9 +1,9 @@
+use itertools::Itertools;
+use reqwest::Url;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-
-use itertools::Itertools;
-use reqwest::Url;
+use std::sync::mpsc;
 use xx::file;
 
 use crate::error::Result;
@@ -24,11 +24,24 @@ pub struct Vfox {
     pub cache_dir: PathBuf,
     pub download_dir: PathBuf,
     pub temp_dir: PathBuf,
+    log_tx: Option<mpsc::Sender<String>>,
 }
 
 impl Vfox {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn log_subscribe(&mut self) -> mpsc::Receiver<String> {
+        let (tx, rx) = mpsc::channel();
+        self.log_tx = Some(tx);
+        rx
+    }
+
+    fn log_emit(&self, msg: String) {
+        if let Some(tx) = &self.log_tx {
+            let _ = tx.send(msg);
+        }
     }
 
     pub fn list_available_sdks() -> &'static BTreeMap<String, Url> {
@@ -166,7 +179,7 @@ impl Vfox {
     }
 
     async fn download(&self, url: &Url, sdk: &Plugin, version: &str) -> Result<PathBuf> {
-        info!("Downloading {url}");
+        self.log_emit(format!("Downloading {url}"));
         let filename = url
             .path_segments()
             .and_then(|s| s.last())
@@ -180,7 +193,7 @@ impl Vfox {
     }
 
     fn verify(&self, pre_install: &PreInstall, file: &Path) -> Result<()> {
-        info!("Verifying {file:?} checksum");
+        self.log_emit(format!("Verifying {file:?} checksum"));
         if let Some(sha256) = &pre_install.sha256 {
             xx::hash::ensure_checksum_sha256(file, sha256)?;
         }
@@ -197,7 +210,7 @@ impl Vfox {
     }
 
     fn extract(&self, file: &Path, install_dir: &Path) -> Result<()> {
-        info!("Extracting {file:?} to {install_dir:?}");
+        self.log_emit(format!("Extracting {file:?} to {install_dir:?}"));
         let filename = file.file_name().unwrap().to_string_lossy().to_string();
         let tmp = self.temp_dir.join(&filename);
         file::remove_dir_all(&tmp)?;
@@ -243,6 +256,7 @@ impl Default for Vfox {
             download_dir: home().join(".version-fox/downloads"),
             install_dir: home().join(".version-fox/installs"),
             temp_dir: home().join(".version-fox/temp"),
+            log_tx: None,
         }
     }
 }
@@ -267,6 +281,7 @@ mod tests {
                 download_dir: PathBuf::from("test/downloads"),
                 install_dir: PathBuf::from("test/installs"),
                 temp_dir: PathBuf::from("test/temp"),
+                log_tx: None,
             }
         }
     }
