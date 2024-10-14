@@ -227,6 +227,7 @@ impl Vfox {
             move_to_install()?;
         } else {
             file::mv(file, install_dir.join(&filename))?;
+            #[cfg(unix)]
             file::make_executable(install_dir.join(&filename))?;
         }
         Ok(())
