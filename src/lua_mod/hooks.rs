@@ -9,14 +9,18 @@ pub struct HookFunc {
 }
 
 #[rustfmt::skip]
-const HOOK_FUNCS: [HookFunc; 7] = [
-    HookFunc { _name: "Available", required: true, filename: "available" },
-    HookFunc { _name: "PreInstall", required: true, filename: "pre_install" },
-    HookFunc { _name: "EnvKeys", required: true, filename: "env_keys" },
+const HOOK_FUNCS: [HookFunc; 9] = [
+    HookFunc { _name: "Available", required: false, filename: "available" },
+    HookFunc { _name: "PreInstall", required: false, filename: "pre_install" },
+    HookFunc { _name: "EnvKeys", required: false, filename: "env_keys" },
     HookFunc { _name: "PostInstall", required: false, filename: "post_install" },
     HookFunc { _name: "PreUse", required: false, filename: "pre_use" },
     HookFunc { _name: "ParseLegacyFile", required: false, filename: "parse_legacy_file" },
     HookFunc { _name: "PreUninstall", required: false, filename: "pre_uninstall" },
+    
+    // mise
+    HookFunc { _name: "MiseEnv", required: false, filename: "mise_env" },
+    HookFunc { _name: "MisePath", required: false, filename: "mise_path" },
 ];
 
 pub fn mod_hooks(lua: &Lua, root: &Path) -> Result<()> {

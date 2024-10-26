@@ -9,6 +9,8 @@ use xx::file;
 use crate::error::Result;
 use crate::hooks::available::AvailableVersion;
 use crate::hooks::env_keys::{EnvKey, EnvKeysContext};
+use crate::hooks::mise_env::MiseEnvContext;
+use crate::hooks::mise_path::MisePathContext;
 use crate::hooks::parse_legacy_file::ParseLegacyFileResponse;
 use crate::hooks::pre_install::PreInstall;
 use crate::metadata::Metadata;
@@ -167,6 +169,24 @@ impl Vfox {
             main: sdk_info,
         };
         plugin.env_keys(ctx).await
+    }
+
+    pub async fn mise_env<T: serde::Serialize>(&self, sdk: &str, opts: T) -> Result<Vec<EnvKey>> {
+        let plugin = self.get_sdk(sdk)?;
+        let ctx = MiseEnvContext {
+            args: vec![],
+            options: opts,
+        };
+        plugin.mise_env(ctx).await
+    }
+
+    pub async fn mise_path<T: serde::Serialize>(&self, sdk: &str, opts: T) -> Result<Vec<String>> {
+        let plugin = self.get_sdk(sdk)?;
+        let ctx = MisePathContext {
+            args: vec![],
+            options: opts,
+        };
+        plugin.mise_path(ctx).await
     }
 
     pub async fn parse_legacy_file(
