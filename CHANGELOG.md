@@ -1,6 +1,16 @@
 # Changelog
 
-## [0.1.6](https://github.com/jdx/vfox.rs/compare/v0.1.4..0.1.6) - 2024-10-14
+## [0.2.0](https://github.com/jdx/vfox.rs/compare/v0.1.6..v0.2.0) - 2024-10-26
+
+### 🚀 Features
+
+- added mise_env/mise_path hooks by [@jdx](https://github.com/jdx) in [6621c24](https://github.com/jdx/vfox.rs/commit/6621c2474d4094586c8fd80962fcc5639dcbe646)
+
+### 🔍 Other Changes
+
+- updated mlua by [@jdx](https://github.com/jdx) in [8944a73](https://github.com/jdx/vfox.rs/commit/8944a7356d1ba404bcb697b564a939c6067b62cc)
+
+## [0.1.6](https://github.com/jdx/vfox.rs/compare/v0.1.4..v0.1.6) - 2024-10-14
 
 ### 🐛 Bug Fixes
 
