@@ -3,7 +3,6 @@ use mlua::{FromLua, IntoLua, Lua, MultiValue, Value};
 use std::path::{Path, PathBuf};
 
 use crate::error::Result;
-use crate::plugin::AppData;
 use crate::Plugin;
 
 #[derive(Debug)]
@@ -44,8 +43,8 @@ impl IntoLua for LegacyFileContext {
         table.set(
             "getInstalledVersions",
             lua.create_async_function(|lua, _input: MultiValue| async move {
-                let app_data = lua.app_data_ref::<AppData>().unwrap();
-                Ok(Plugin::from_dir(app_data.plugin_dir.as_path())
+                let plugin_dir = lua.named_registry_value::<PathBuf>("plugin_dir")?;
+                Ok(Plugin::from_dir(plugin_dir.as_path())
                     .map_err(|e| LuaError::RuntimeError(e.to_string()))?
                     .available_async()
                     .await
