@@ -18,8 +18,8 @@ impl SdkInfo {
     }
 }
 
-impl<'lua> IntoLua<'lua> for SdkInfo {
-    fn into_lua(self, lua: &'lua Lua) -> mlua::Result<Value<'lua>> {
+impl IntoLua for SdkInfo {
+    fn into_lua(self, lua: &Lua) -> mlua::Result<Value> {
         let table = lua.create_table()?;
         table.set("name", self.name)?;
         table.set("version", self.version)?;

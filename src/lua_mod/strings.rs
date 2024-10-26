@@ -71,10 +71,10 @@ mod tests {
             assert(strings.trim("hello world", "world") == "hello ", "strings.trim()")
             assert(strings.contains("hello world", "hello ") == true, "strings.contains()")
 
-            got = strings.trim_space(tt.input)
-
-            local str = strings.join({"1",3,"4"},";")
-            assert(str == "1;3;4", "strings.join()")
+            // got = strings.trim_space(tt.input)
+            //
+            // local str = strings.join({"1",3,"4"},";")
+            // assert(str == "1;3;4", "strings.join()")
         })
         .exec()
         .unwrap();

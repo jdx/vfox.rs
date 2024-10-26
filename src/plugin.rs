@@ -84,22 +84,16 @@ impl Plugin {
         Ok(ctx)
     }
 
-    pub(crate) async fn exec_async<'lua, 'a>(
-        &'lua self,
-        chunk: impl AsChunk<'lua, 'a>,
-    ) -> Result<()> {
+    pub(crate) async fn exec_async<'a>(&self, chunk: impl AsChunk<'a>) -> Result<()> {
         self.load()?;
         let chunk = self.lua.load(chunk);
         chunk.exec_async().await?;
         Ok(())
     }
 
-    pub(crate) async fn eval_async<'lua, 'a, R>(
-        &'lua self,
-        chunk: impl AsChunk<'lua, 'a>,
-    ) -> Result<R>
+    pub(crate) async fn eval_async<'a, R>(&self, chunk: impl AsChunk<'a>) -> Result<R>
     where
-        R: FromLuaMulti<'lua> + 'lua,
+        R: FromLuaMulti,
     {
         self.load()?;
         let chunk = self.lua.load(chunk);
@@ -136,9 +130,9 @@ impl Plugin {
         })
     }
 
-    fn set_global<'lua, V>(&'lua self, name: &str, value: V) -> Result<()>
+    fn set_global<V>(&self, name: &str, value: V) -> Result<()>
     where
-        V: IntoLua<'lua>,
+        V: IntoLua,
     {
         self.lua.globals().set(name, value)?;
         Ok(())
@@ -157,7 +151,7 @@ impl Plugin {
 }
 
 fn get_package(lua: &Lua) -> Result<Table> {
-    let package = lua.globals().get::<_, Table>("package")?;
+    let package = lua.globals().get::<Table>("package")?;
     Ok(package)
 }
 

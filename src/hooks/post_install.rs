@@ -27,7 +27,7 @@ pub struct PostInstallContext {
 }
 
 impl UserData for PostInstallContext {
-    fn add_fields<'lua, F: UserDataFields<'lua, Self>>(fields: &mut F) {
+    fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
         let config = Config::get();
         fields.add_field_method_get("rootPath", |_, t| Ok(t.root_path.clone()));
         fields.add_field_method_get("runtimeVersion", move |_, _| {

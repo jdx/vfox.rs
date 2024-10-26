@@ -36,14 +36,14 @@ impl Plugin {
     }
 }
 
-impl<'lua> IntoLua<'lua> for LegacyFileContext {
-    fn into_lua(self, lua: &'lua Lua) -> mlua::Result<Value<'lua>> {
+impl IntoLua for LegacyFileContext {
+    fn into_lua(self, lua: &Lua) -> mlua::Result<Value> {
         let table = lua.create_table()?;
         table.set("args", self.args)?;
         table.set("filepath", self.filepath.to_string_lossy().to_string())?;
         table.set(
             "getInstalledVersions",
-            lua.create_async_function(move |lua, _input: MultiValue| async {
+            lua.create_async_function(|lua, _input: MultiValue| async move {
                 let app_data = lua.app_data_ref::<AppData>().unwrap();
                 Ok(Plugin::from_dir(app_data.plugin_dir.as_path())
                     .map_err(|e| LuaError::RuntimeError(e.to_string()))?
@@ -59,11 +59,11 @@ impl<'lua> IntoLua<'lua> for LegacyFileContext {
     }
 }
 
-impl<'lua> FromLua<'lua> for ParseLegacyFileResponse {
-    fn from_lua(value: Value<'lua>, _: &'lua Lua) -> std::result::Result<Self, LuaError> {
+impl FromLua for ParseLegacyFileResponse {
+    fn from_lua(value: Value, _: &Lua) -> std::result::Result<Self, LuaError> {
         match value {
             Value::Table(table) => Ok(ParseLegacyFileResponse {
-                version: table.get::<_, Option<String>>("version")?,
+                version: table.get::<Option<String>>("version")?,
             }),
             _ => panic!("Expected table"),
         }

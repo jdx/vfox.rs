@@ -13,11 +13,16 @@ pub fn mod_file(lua: &Lua) -> Result<()> {
     let loaded: Table = package.get("loaded")?;
     Ok(loaded.set(
         "file",
-        lua.create_table_from(vec![("symlink", lua.create_async_function(symlink)?)])?,
+        lua.create_table_from(vec![(
+            "symlink",
+            lua.create_async_function(|_lua: mlua::Lua, input| async move {
+                symlink(&_lua, input).await
+            })?,
+        )])?,
     )?)
 }
 
-async fn symlink<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> mlua::Result<()> {
+async fn symlink(_lua: &Lua, input: MultiValue) -> mlua::Result<()> {
     let input: Vec<String> = input
         .into_iter()
         .map(|v| v.to_string())

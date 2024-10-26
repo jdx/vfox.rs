@@ -6,14 +6,29 @@ pub fn mod_http(lua: &Lua) -> Result<()> {
     loaded.set(
         "http",
         lua.create_table_from(vec![
-            ("get", lua.create_async_function(get)?),
-            ("head", lua.create_async_function(head)?),
-            ("download_file", lua.create_async_function(download_file)?),
+            (
+                "get",
+                lua.create_async_function(|lua: mlua::Lua, input| async move {
+                    get(&lua, input).await
+                })?,
+            ),
+            (
+                "head",
+                lua.create_async_function(|lua: mlua::Lua, input| async move {
+                    head(&lua, input).await
+                })?,
+            ),
+            (
+                "download_file",
+                lua.create_async_function(|_lua: mlua::Lua, input| async move {
+                    download_file(&_lua, input).await
+                })?,
+            ),
         ])?,
     )
 }
 
-async fn get<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
+async fn get(lua: &Lua, input: Table) -> Result<Table> {
     let url: String = input.get("url").into_lua_err()?;
     let resp = reqwest::get(&url)
         .await
@@ -26,7 +41,7 @@ async fn get<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
     Ok(t)
 }
 
-async fn download_file<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> Result<()> {
+async fn download_file(_lua: &Lua, input: MultiValue) -> Result<()> {
     let t: &Table = input.iter().next().unwrap().as_table().unwrap();
     let url: String = t.get("url").into_lua_err()?;
     let path: String = input.iter().nth(1).unwrap().to_string()?;
@@ -40,7 +55,7 @@ async fn download_file<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> Result
     Ok(())
 }
 
-async fn head<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
+async fn head(lua: &Lua, input: Table) -> Result<Table> {
     let url: String = input.get("url").into_lua_err()?;
     let resp = reqwest::Client::new()
         .head(&url)
@@ -54,7 +69,7 @@ async fn head<'lua>(lua: &'lua Lua, input: Table<'lua>) -> Result<Table<'lua>> {
     Ok(t)
 }
 
-fn get_headers<'lua>(lua: &'lua Lua, headers: &reqwest::header::HeaderMap) -> Result<Table<'lua>> {
+fn get_headers(lua: &Lua, headers: &reqwest::header::HeaderMap) -> Result<Table> {
     let t = lua.create_table()?;
     for (name, value) in headers.iter() {
         t.set(name.as_str(), value.to_str().into_lua_err()?)?;

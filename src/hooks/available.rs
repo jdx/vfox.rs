@@ -29,18 +29,18 @@ impl Plugin {
 pub struct AvailableVersion {
     pub version: String,
     pub note: Option<String>,
-    // pub addition: Option<Table<'lua>>,
+    // pub addition: Option<Table>,
 }
 
-impl<'lua> FromLua<'lua> for AvailableVersion {
-    fn from_lua(value: Value<'lua>, _: &'lua Lua) -> std::result::Result<Self, LuaError> {
+impl FromLua for AvailableVersion {
+    fn from_lua(value: Value, _: &Lua) -> std::result::Result<Self, LuaError> {
         match value {
             Value::Table(table) => {
                 // TODO: try to default this to an empty table or something
-                // let addition = table.get::<_, Option<Table>>("addition")?;
+                // let addition = table.get::<Option<Table>>("addition")?;
                 Ok(AvailableVersion {
-                    version: table.get::<_, String>("version")?,
-                    note: table.get::<_, Option<String>>("note")?,
+                    version: table.get::<String>("version")?,
+                    note: table.get::<Option<String>>("note")?,
                     // addition,
                 })
             }

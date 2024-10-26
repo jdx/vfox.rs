@@ -14,11 +14,11 @@ pub struct Metadata {
     pub homepage: Option<String>,
 }
 
-impl<'lua> TryFrom<Table<'lua>> for Metadata {
+impl TryFrom<Table> for Metadata {
     type Error = VfoxError;
-    fn try_from(t: Table<'lua>) -> Result<Self> {
+    fn try_from(t: Table) -> Result<Self> {
         let legacy_filenames = t
-            .get::<_, Option<Vec<String>>>("legacyFilenames")?
+            .get::<Option<Vec<String>>>("legacyFilenames")?
             .unwrap_or_default();
         Ok(Metadata {
             name: t.get("name")?,

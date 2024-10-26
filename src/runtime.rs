@@ -48,7 +48,7 @@ impl Runtime {
 }
 
 impl UserData for Runtime {
-    fn add_fields<'lua, F: UserDataFields<'lua, Self>>(fields: &mut F) {
+    fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
         fields.add_field_method_get("osType", |_, t| Ok(t.os.clone()));
         fields.add_field_method_get("archType", |_, t| Ok(t.arch.clone()));
         // fields.add_field_method_get("version", |_, t| Ok(t.version.clone()));

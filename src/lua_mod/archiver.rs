@@ -7,12 +7,17 @@ pub fn mod_archiver(lua: &Lua) -> Result<()> {
     let loaded: Table = package.get("loaded")?;
     Ok(loaded.set(
         "archiver",
-        lua.create_table_from(vec![("decompress", lua.create_async_function(decompress)?)])?,
+        lua.create_table_from(vec![(
+            "decompress",
+            lua.create_async_function(
+                |_lua: mlua::Lua, input| async move { decompress(&_lua, input) },
+            )?,
+        )])?,
     )?)
 }
 
-async fn decompress<'lua>(_lua: &'lua Lua, input: MultiValue<'lua>) -> mlua::Result<()> {
-    let paths = input.into_vec();
+fn decompress(_lua: &Lua, input: MultiValue) -> mlua::Result<()> {
+    let paths: Vec<mlua::Value> = input.into_iter().collect();
     let archive: PathBuf = PathBuf::from(paths[0].to_string()?);
     let destination: PathBuf = PathBuf::from(paths[1].to_string()?);
     let filename = archive.file_name().unwrap().to_str().unwrap();

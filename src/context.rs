@@ -8,7 +8,7 @@ pub(crate) struct Context {
 }
 
 impl UserData for Context {
-    fn add_fields<'lua, F: UserDataFields<'lua, Self>>(fields: &mut F) {
+    fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
         fields.add_field_method_get("args", |_, t| Ok(t.args.clone()));
         fields.add_field_method_get("version", |_, t| Ok(t.version.clone()));
         // fields.add_field_method_get("runtimeVersion", |_, t| Ok(t.runtime_version.clone()));

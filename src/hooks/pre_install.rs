@@ -28,28 +28,28 @@ pub struct PreInstall {
     pub md5: Option<String>,
     pub sha1: Option<String>,
     pub sha512: Option<String>,
-    // pub addition: Option<Table<'lua>>,
+    // pub addition: Option<Table>,
 }
 
-impl<'lua> FromLua<'lua> for PreInstall {
-    fn from_lua(value: Value<'lua>, _: &'lua Lua) -> std::result::Result<Self, LuaError> {
+impl FromLua for PreInstall {
+    fn from_lua(value: Value, _: &Lua) -> std::result::Result<Self, LuaError> {
         match value {
             Value::Table(table) => {
                 if !table.contains_key("version")? {
                     return Err(LuaError::FromLuaConversionError {
                         from: "table",
-                        to: "PreInstall",
+                        to: "PreInstall".into(),
                         message: Some("no version returned from vfox plugin".to_string()),
                     });
                 }
                 Ok(PreInstall {
-                    version: table.get::<_, String>("version")?,
-                    url: table.get::<_, Option<String>>("url")?,
-                    note: table.get::<_, Option<String>>("note")?,
-                    sha256: table.get::<_, Option<String>>("sha256")?,
-                    md5: table.get::<_, Option<String>>("md5")?,
-                    sha1: table.get::<_, Option<String>>("sha1")?,
-                    sha512: table.get::<_, Option<String>>("sha512")?,
+                    version: table.get::<String>("version")?,
+                    url: table.get::<Option<String>>("url")?,
+                    note: table.get::<Option<String>>("note")?,
+                    sha256: table.get::<Option<String>>("sha256")?,
+                    md5: table.get::<Option<String>>("md5")?,
+                    sha1: table.get::<Option<String>>("sha1")?,
+                    sha512: table.get::<Option<String>>("sha512")?,
                     // addition,
                 })
             }

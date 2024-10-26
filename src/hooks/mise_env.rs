@@ -27,8 +27,8 @@ impl Plugin {
     }
 }
 
-impl<'lua, T: serde::Serialize> IntoLua<'lua> for MiseEnvContext<T> {
-    fn into_lua(self, lua: &'lua Lua) -> mlua::Result<Value<'lua>> {
+impl<T: serde::Serialize> IntoLua for MiseEnvContext<T> {
+    fn into_lua(self, lua: &Lua) -> mlua::Result<Value> {
         let table = lua.create_table()?;
         table.set("options", lua.to_value(&self.options)?)?;
         Ok(Value::Table(table))

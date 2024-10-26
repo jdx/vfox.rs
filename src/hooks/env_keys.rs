@@ -36,8 +36,8 @@ impl Plugin {
     }
 }
 
-impl<'lua> IntoLua<'lua> for EnvKeysContext {
-    fn into_lua(self, lua: &'lua Lua) -> mlua::Result<Value<'lua>> {
+impl IntoLua for EnvKeysContext {
+    fn into_lua(self, lua: &Lua) -> mlua::Result<Value> {
         let table = lua.create_table()?;
         table.set("version", self.version)?;
         table.set("path", self.path.to_string_lossy().to_string())?;
@@ -51,12 +51,12 @@ impl<'lua> IntoLua<'lua> for EnvKeysContext {
     }
 }
 
-impl<'lua> FromLua<'lua> for EnvKey {
-    fn from_lua(value: Value<'lua>, _: &'lua Lua) -> std::result::Result<Self, LuaError> {
+impl FromLua for EnvKey {
+    fn from_lua(value: Value, _: &Lua) -> std::result::Result<Self, LuaError> {
         match value {
             Value::Table(table) => Ok(EnvKey {
-                key: table.get::<_, String>("key")?,
-                value: table.get::<_, String>("value")?,
+                key: table.get::<String>("key")?,
+                value: table.get::<String>("value")?,
             }),
             _ => panic!("Expected table"),
         }
