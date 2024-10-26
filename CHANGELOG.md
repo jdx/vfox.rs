@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1](https://github.com/jdx/vfox.rs/compare/v0.2.0..v0.2.1) - 2024-10-26
+
+### 🐛 Bug Fixes
+
+- added "send" feature to mlua by [@jdx](https://github.com/jdx) in [49cef81](https://github.com/jdx/vfox.rs/commit/49cef815ac946ee93af016d42751ce25e1fc65ce)
+
 ## [0.2.0](https://github.com/jdx/vfox.rs/compare/v0.1.6..v0.2.0) - 2024-10-26
 
 ### 🚀 Features
