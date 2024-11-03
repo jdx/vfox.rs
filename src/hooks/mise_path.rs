@@ -21,7 +21,6 @@ impl Plugin {
                 return PLUGIN:MisePath($ctx)
             })
             .await?;
-        dbg!(&path);
 
         Ok(path)
     }
