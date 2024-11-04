@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2](https://github.com/jdx/vfox.rs/compare/v0.2.1..v0.2.2) - 2024-11-03
+
+### 🔍 Other Changes
+
+- Remove `dbg!` from `mise_path` plugin to reduce noise by [@joshbode](https://github.com/joshbode) in [#50](https://github.com/jdx/vfox.rs/pull/50)
+
+### New Contributors
+
+- @joshbode made their first contribution in [#50](https://github.com/jdx/vfox.rs/pull/50)
+
 ## [0.2.1](https://github.com/jdx/vfox.rs/compare/v0.2.0..v0.2.1) - 2024-10-26
 
 ### 🐛 Bug Fixes
