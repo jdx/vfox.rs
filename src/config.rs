@@ -3,7 +3,6 @@ use std::sync::{Mutex, MutexGuard};
 
 #[derive(Debug, Clone)]
 pub struct Config {
-    pub runtime_version: String,
     pub plugin_dir: PathBuf,
 }
 
@@ -22,7 +21,6 @@ impl Config {
                 .flatten()
                 .unwrap_or_else(|| PathBuf::from("/"));
             *config = Some(Config {
-                runtime_version: "1.0.0".to_string(),
                 plugin_dir: home.join(".version-fox/plugin"),
             });
         }

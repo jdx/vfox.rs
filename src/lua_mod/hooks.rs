@@ -1,5 +1,6 @@
 use crate::error::Result;
 use mlua::Lua;
+use std::collections::BTreeSet;
 use std::path::Path;
 
 pub struct HookFunc {
@@ -23,14 +24,16 @@ const HOOK_FUNCS: [HookFunc; 9] = [
     HookFunc { _name: "MisePath", required: false, filename: "mise_path" },
 ];
 
-pub fn mod_hooks(lua: &Lua, root: &Path) -> Result<()> {
+pub fn mod_hooks(lua: &Lua, root: &Path) -> Result<BTreeSet<&'static str>> {
+    let mut hooks = BTreeSet::new();
     for hook in &HOOK_FUNCS {
         let hook_path = root.join("hooks").join(format!("{}.lua", hook.filename));
         if hook_path.exists() {
             lua.load(hook_path).exec()?;
+            hooks.insert(hook.filename);
         } else if hook.required {
             return Err(format!("Required hook '{}' not found", hook.filename).into());
         }
     }
-    Ok(())
+    Ok(hooks)
 }

@@ -1,4 +1,5 @@
 use mlua::Table;
+use std::collections::BTreeSet;
 
 use crate::error::Result;
 use crate::error::VfoxError;
@@ -12,6 +13,7 @@ pub struct Metadata {
     pub author: Option<String>,
     pub license: Option<String>,
     pub homepage: Option<String>,
+    pub hooks: BTreeSet<&'static str>,
 }
 
 impl TryFrom<Table> for Metadata {
@@ -28,6 +30,7 @@ impl TryFrom<Table> for Metadata {
             author: t.get("author")?,
             license: t.get("license")?,
             homepage: t.get("homepage")?,
+            hooks: Default::default(),
         })
     }
 }

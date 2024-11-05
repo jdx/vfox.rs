@@ -32,7 +32,7 @@ async fn get(lua: &Lua, input: Table) -> Result<Table> {
     let url: String = input.get("url").into_lua_err()?;
     let resp = reqwest::get(&url)
         .await
-        .and_then(|resp| resp.error_for_status())
+        // .and_then(|resp| resp.error_for_status())
         .into_lua_err()?;
     let t = lua.create_table()?;
     t.set("status_code", resp.status().as_u16())?;
@@ -61,7 +61,7 @@ async fn head(lua: &Lua, input: Table) -> Result<Table> {
         .head(&url)
         .send()
         .await
-        .and_then(|resp| resp.error_for_status())
+        // .and_then(|resp| resp.error_for_status())
         .into_lua_err()?;
     let t = lua.create_table()?;
     t.set("status_code", resp.status().as_u16())?;
@@ -132,7 +132,6 @@ mod tests {
         .exec_async()
         .await
         .unwrap();
-        dbg!(fs::read_to_string(path).unwrap());
         // TODO: figure out why this fails on gha
         assert!(fs::read_to_string(path).unwrap().contains("vfox-nodejs"));
         tokio::fs::remove_file(path).await.unwrap();

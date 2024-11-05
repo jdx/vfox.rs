@@ -41,11 +41,7 @@ impl IntoLua for EnvKeysContext {
         let table = lua.create_table()?;
         table.set("version", self.version)?;
         table.set("path", self.path.to_string_lossy().to_string())?;
-        let sdk_info = lua.create_table()?;
-        for (k, v) in self.sdk_info {
-            sdk_info.set(k, v)?;
-        }
-        table.set("sdkInfo", sdk_info)?;
+        table.set("sdkInfo", self.sdk_info)?;
         table.set("main", self.main)?;
         Ok(Value::Table(table))
     }

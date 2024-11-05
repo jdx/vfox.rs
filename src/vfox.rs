@@ -12,6 +12,7 @@ use crate::hooks::env_keys::{EnvKey, EnvKeysContext};
 use crate::hooks::mise_env::MiseEnvContext;
 use crate::hooks::mise_path::MisePathContext;
 use crate::hooks::parse_legacy_file::ParseLegacyFileResponse;
+use crate::hooks::post_install::PostInstallContext;
 use crate::hooks::pre_install::PreInstall;
 use crate::metadata::Metadata;
 use crate::plugin::Plugin;
@@ -60,8 +61,9 @@ impl Vfox {
         if !path.exists() {
             return Ok(Default::default());
         }
+        let sdk = self.get_sdk(sdk)?;
         let versions = xx::file::ls(&path)?;
-        Ok(versions
+        versions
             .into_iter()
             .filter_map(|p| {
                 p.file_name()
@@ -69,8 +71,11 @@ impl Vfox {
                     .map(|s| s.to_string())
             })
             .sorted()
-            .map(|version| SdkInfo::new(sdk.to_string(), version.to_string(), path.join(&version)))
-            .collect())
+            .map(|version| {
+                let path = path.join(&version);
+                sdk.sdk_info(version, path)
+            })
+            .collect::<Result<_>>()
     }
     pub fn list_sdks(&self) -> Result<Vec<Plugin>> {
         if !self.plugin_dir.exists() {
@@ -138,11 +143,24 @@ impl Vfox {
         self.install_plugin(sdk)?;
         let sdk = self.get_sdk(sdk)?;
         let pre_install = sdk.pre_install(version).await?;
+        let install_dir = install_dir.as_ref();
         trace!("{:?}", pre_install);
-        let url = Url::from_str(pre_install.url.as_ref().unwrap())?;
-        let file = self.download(&url, &sdk, version).await?;
-        self.verify(&pre_install, &file)?;
-        self.extract(&file, install_dir.as_ref())?;
+        if let Some(url) = pre_install.url.as_ref().map(|s| Url::from_str(s)) {
+            let file = self.download(&url?, &sdk, version).await?;
+            self.verify(&pre_install, &file)?;
+            self.extract(&file, install_dir)?;
+        }
+
+        if sdk.get_metadata()?.hooks.contains("post_install") {
+            let sdk_info = sdk.sdk_info(version.to_string(), install_dir.to_path_buf())?;
+            sdk.post_install(PostInstallContext {
+                root_path: install_dir.to_path_buf(),
+                runtime_version: self.runtime_version.clone(),
+                sdk_info: BTreeMap::from([(sdk_info.name.clone(), sdk_info)]),
+            })
+            .await?;
+        }
+
         Ok(())
     }
 
@@ -158,17 +176,19 @@ impl Vfox {
 
     pub async fn env_keys(&self, sdk: &str, version: &str) -> Result<Vec<EnvKey>> {
         debug!("Getting env keys for {sdk} version {version}");
-        let plugin = self.get_sdk(sdk)?;
-        let path = self.install_dir.join(sdk).join(version);
-        let sdk_info = SdkInfo::new(sdk.to_string(), version.to_string(), path.clone());
+        let sdk = self.get_sdk(sdk)?;
+        let sdk_info = sdk.sdk_info(
+            version.to_string(),
+            self.install_dir.join(&sdk.name).join(version),
+        )?;
         let ctx = EnvKeysContext {
             args: vec![],
             version: version.to_string(),
-            path,
-            sdk_info: BTreeMap::from([(sdk.to_string(), sdk_info.clone())]),
+            path: sdk_info.path.clone(),
+            sdk_info: BTreeMap::from([(sdk_info.name.clone(), sdk_info.clone())]),
             main: sdk_info,
         };
-        plugin.env_keys(ctx).await
+        sdk.env_keys(ctx).await
     }
 
     pub async fn mise_env<T: serde::Serialize>(&self, sdk: &str, opts: T) -> Result<Vec<EnvKey>> {
