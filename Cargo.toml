@@ -7,6 +7,7 @@ description = "Interface to vfox plugins"
 documentation = "https://docs.rs/vfox"
 homepage = "https://github.com/jdx/vfox.rs"
 repository = "https://github.com/jdx/vfox.rs"
+include = ["src", "lua", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE"]
 
 [lib]
 name = "vfox"
@@ -21,10 +22,9 @@ homedir = "0.3"
 indexmap = "2"
 itertools = "0.13"
 log = "0.4"
-mlua = { version = "0.10", features = ["async", "lua54", "macros", "serialize", "vendored", "send"] }
+mlua = { version = "0.10", features = ["async", "lua51", "macros", "serialize", "vendored", "send"] }
 once_cell = "1"
 reqwest = { version = "0.12", features = [] } # TODO: replace with xx
-scraper = "0.20"
 serde = "1"
 serde_json = "1"
 thiserror = "1"

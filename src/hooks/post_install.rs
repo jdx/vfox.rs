@@ -1,17 +1,12 @@
-use crate::config::Config;
-use mlua::{UserData, UserDataFields};
-
 use crate::error::Result;
+use crate::sdk_info::SdkInfo;
 use crate::Plugin;
+use mlua::{IntoLua, Lua, Value};
+use std::collections::BTreeMap;
+use std::path::PathBuf;
 
 impl Plugin {
-    #[tokio::main(flavor = "current_thread")]
-    #[allow(clippy::needless_return)]
     pub async fn post_install(&self, ctx: PostInstallContext) -> Result<()> {
-        self.post_install_async(ctx).await
-    }
-
-    pub async fn post_install_async(&self, ctx: PostInstallContext) -> Result<()> {
         debug!("[vfox:{}] post_install", &self.name);
         self.exec_async(chunk! {
             require "hooks/post_install"
@@ -22,33 +17,36 @@ impl Plugin {
 }
 
 pub struct PostInstallContext {
-    pub args: Vec<String>,
-    pub root_path: String,
+    pub root_path: PathBuf,
+    pub runtime_version: String,
+    pub sdk_info: BTreeMap<String, SdkInfo>,
 }
 
-impl UserData for PostInstallContext {
-    fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
-        let config = Config::get();
-        fields.add_field_method_get("rootPath", |_, t| Ok(t.root_path.clone()));
-        fields.add_field_method_get("runtimeVersion", move |_, _| {
-            Ok(config.runtime_version.clone())
-        });
+impl IntoLua for PostInstallContext {
+    fn into_lua(self, lua: &Lua) -> mlua::Result<Value> {
+        let table = lua.create_table()?;
+        table.set("rootPath", self.root_path.to_string_lossy().to_string())?;
+        table.set("runtimeVersion", self.runtime_version)?;
+        table.set("sdkInfo", self.sdk_info)?;
+        Ok(Value::Table(table))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::Plugin;
+    use tokio::test;
 
     use super::*;
 
     #[test]
-    fn dummy() {
+    async fn dummy() {
         let p = Plugin::test("dummy");
         let ctx = PostInstallContext {
-            args: vec![],
-            root_path: "/tmp".to_string(),
+            root_path: PathBuf::from("root_path"),
+            runtime_version: "runtime_version".to_string(),
+            sdk_info: BTreeMap::new(),
         };
-        p.post_install(ctx).unwrap();
+        p.post_install(ctx).await.unwrap();
     }
 }

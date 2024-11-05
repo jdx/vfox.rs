@@ -10,6 +10,7 @@ use crate::context::Context;
 use crate::error::Result;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
+use crate::sdk_info::SdkInfo;
 use crate::{error, lua_mod, VfoxError};
 
 #[derive(Debug)]
@@ -59,6 +60,14 @@ impl Plugin {
 
     pub fn get_metadata(&self) -> Result<Metadata> {
         Ok(self.load()?.clone())
+    }
+
+    pub fn sdk_info(&self, version: String, install_dir: PathBuf) -> Result<SdkInfo> {
+        Ok(SdkInfo::new(
+            self.get_metadata()?.name.clone(),
+            version,
+            install_dir,
+        ))
     }
 
     #[cfg(test)]
@@ -117,9 +126,11 @@ impl Plugin {
             self.set_global("PLUGIN", metadata.clone())?;
             self.set_global("RUNTIME", Runtime::get())?;
 
-            lua_mod::hooks(&self.lua, &self.dir)?;
+            let mut metadata: Metadata = metadata.try_into()?;
 
-            metadata.try_into()
+            metadata.hooks = lua_mod::hooks(&self.lua, &self.dir)?;
+
+            Ok(metadata)
         })
     }
 
