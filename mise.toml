@@ -1,4 +1,5 @@
 [tools]
+"cargo-binstall" = "latest"
 "cargo:cargo-edit" = "latest"
 "cargo:git-cliff" = "latest"
 "npm:prettier" = "latest"
