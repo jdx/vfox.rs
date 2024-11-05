@@ -1,6 +1,12 @@
 # Changelog
 
-## [0.2.2](https://github.com/jdx/vfox.rs/compare/v0.2.1..v0.2.2) - 2024-11-03
+## [0.3.0](https://github.com/jdx/vfox.rs/compare/v0.2.2..v0.3.0) - 2024-11-05
+
+### 🚀 Features
+
+- add http module by [@jdx](https://github.com/jdx) in [#52](https://github.com/jdx/vfox.rs/pull/52)
+
+## [0.2.2](https://github.com/jdx/vfox.rs/compare/v0.2.1..v0.2.2) - 2024-11-04
 
 ### 🔍 Other Changes
 
