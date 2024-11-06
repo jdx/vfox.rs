@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.1](https://github.com/jdx/vfox.rs/compare/v0.3.0..v0.3.1) - 2024-11-06
+
+### 🔍 Other Changes
+
+- added cargo-binstall to mise.toml by [@jdx](https://github.com/jdx) in [#54](https://github.com/jdx/vfox.rs/pull/54)
+
 ## [0.3.0](https://github.com/jdx/vfox.rs/compare/v0.2.2..v0.3.0) - 2024-11-05
 
 ### 🚀 Features
