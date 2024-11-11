@@ -29,14 +29,6 @@ pub fn mod_html(lua: &Lua) -> mlua::Result<()> {
                             local nodes = self.node:select(tag)
                             return Node.new(nodes)
                         end,
-                        attr = function(self, key)
-                            return self.node.attributes[key]
-                        end,
-                        each = function(self, f)
-                            for i, node in ipairs(self.nodes) do
-                                f(i - 1, Node.new({node}))
-                            end
-                        end,
                         first = function(self)
                             return Node.new({self.nodes[1]})
                         end,
@@ -44,14 +36,28 @@ pub fn mod_html(lua: &Lua) -> mlua::Result<()> {
                             local node = self.nodes[idx + 1]
                             return Node.new({node})
                         end,
+                        each = function(self, f)
+                            for i, node in ipairs(self.nodes) do
+                                f(i - 1, Node.new({node}))
+                            end
+                        end,
                         text = function(self)
+                            if self.node == nil then
+                                return ""
+                            end
                             return self.node:getcontent()
-                        end
+                        end,
+                        attr = function(self, key)
+                            if self.node == nil then
+                                return ""
+                            end
+                            return self.node.attributes[key]
+                        end,
                     }
                     Node.new = function(nodes)
                         return setmetatable({nodes = nodes, node = nodes[1]}, {__index = Node})
                     end
-                    local root = htmlparser.parse(s)
+                    local root = htmlparser.parse(s, 100000)
                     return Node.new({root})
                 end
             }
@@ -64,6 +70,7 @@ pub fn mod_html(lua: &Lua) -> mlua::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::lua_mod::http::mod_http;
 
     #[test]
     fn test_html() {
@@ -89,5 +96,54 @@ mod tests {
         })
             .exec()
             .unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore] // TODO: make this actually work
+    async fn test_html_go() {
+        let lua = Lua::new();
+        mod_html(&lua).unwrap();
+        mod_http(&lua).unwrap();
+        lua.load(mlua::chunk! {
+            local http = require("http")
+            local html = require("html")
+
+            table = {}
+
+            resp, err = http.get({
+                url = "https://go.dev/dl/"
+            })
+            if err ~= nil or resp.status_code ~= 200 then
+                error("parsing release info failed." .. err)
+            end
+            local doc = html.parse(resp.body)
+            local listDoc = doc:find("div#archive")
+            listDoc:find(".toggle"):each(function(i, selection)
+                local versionStr = selection:attr("id")
+                if versionStr ~= nil then
+                    selection:find("table.downloadtable tr"):each(function(ti, ts)
+                        local td = ts:find("td")
+                        local filename = td:eq(0):text()
+                        local kind = td:eq(1):text()
+                        local os = td:eq(2):text()
+                        local arch = td:eq(3):text()
+                        local checksum = td:eq(5):text()
+                        if kind == "Archive" and os == "Windows" and arch == "x86-64" then
+                            table.insert(result, {
+                                version = string.sub(versionStr, 3),
+                                url = "https://go.dev/dl/" .. filename,
+                                note = "",
+                                sha256 = checksum,
+                            })
+                        end
+                    end)
+                end
+            end)
+            print(table)
+            // TODO: check results
+        })
+        .exec_async()
+        .await
+        .unwrap();
     }
 }
