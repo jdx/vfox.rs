@@ -124,7 +124,7 @@ impl Plugin {
 
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;
-            self.set_global("RUNTIME", Runtime::get())?;
+            self.set_global("RUNTIME", Runtime::get(self.dir.clone()))?;
             self.set_global("OS_TYPE", config::os())?;
             self.set_global("ARCH_TYPE", config::arch())?;
 
