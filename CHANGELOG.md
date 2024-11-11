@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.2](https://github.com/jdx/vfox.rs/compare/v0.3.1..v0.3.2) - 2024-11-11
+
+### 🐛 Bug Fixes
+
+- increase html parser limit by [@jdx](https://github.com/jdx) in [1bae49d](https://github.com/jdx/vfox.rs/commit/1bae49dc01fa82c7c7344972c80647390eb4ced7)
+- set OS_TYPE,ARCH_TYPE by [@jdx](https://github.com/jdx) in [9851ae2](https://github.com/jdx/vfox.rs/commit/9851ae2c607adf39b798da525949285bdcb31774)
+- added more runtime config by [@jdx](https://github.com/jdx) in [#59](https://github.com/jdx/vfox.rs/pull/59)
+
+### 🔍 Other Changes
+
+- updated deps by [@jdx](https://github.com/jdx) in [7b6a78b](https://github.com/jdx/vfox.rs/commit/7b6a78b432beee7575163864875377e56c6669c1)
+
 ## [0.3.1](https://github.com/jdx/vfox.rs/compare/v0.3.0..v0.3.1) - 2024-11-06
 
 ### 🔍 Other Changes
