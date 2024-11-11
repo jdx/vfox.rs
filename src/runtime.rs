@@ -1,5 +1,5 @@
+use crate::config::{arch, os};
 use mlua::{UserData, UserDataFields};
-use std::env::consts::{ARCH, OS};
 use std::sync::{Mutex, MutexGuard};
 
 #[derive(Debug, Clone)]
@@ -52,20 +52,5 @@ impl UserData for Runtime {
         fields.add_field_method_get("osType", |_, t| Ok(t.os.clone()));
         fields.add_field_method_get("archType", |_, t| Ok(t.arch.clone()));
         // fields.add_field_method_get("version", |_, t| Ok(t.version.clone()));
-    }
-}
-
-fn os() -> String {
-    match OS {
-        "macos" => "darwin".to_string(),
-        os => os.to_string(),
-    }
-}
-
-fn arch() -> String {
-    match ARCH {
-        "aarch64" => "arm64".to_string(),
-        "x86_64" => "amd64".to_string(),
-        arch => arch.to_string(),
     }
 }

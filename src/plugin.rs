@@ -11,7 +11,7 @@ use crate::error::Result;
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
 use crate::sdk_info::SdkInfo;
-use crate::{error, lua_mod, VfoxError};
+use crate::{config, error, lua_mod, VfoxError};
 
 #[derive(Debug)]
 pub struct Plugin {
@@ -125,6 +125,8 @@ impl Plugin {
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;
             self.set_global("RUNTIME", Runtime::get())?;
+            self.set_global("OS_TYPE", config::os())?;
+            self.set_global("ARCH_TYPE", config::arch())?;
 
             let mut metadata: Metadata = metadata.try_into()?;
 

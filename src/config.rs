@@ -1,3 +1,4 @@
+use std::env::consts::{ARCH, OS};
 use std::path::PathBuf;
 use std::sync::{Mutex, MutexGuard};
 
@@ -25,5 +26,20 @@ impl Config {
             });
         }
         config
+    }
+}
+
+pub fn os() -> String {
+    match OS {
+        "macos" => "darwin".to_string(),
+        os => os.to_string(),
+    }
+}
+
+pub fn arch() -> String {
+    match ARCH {
+        "aarch64" => "arm64".to_string(),
+        "x86_64" => "amd64".to_string(),
+        arch => arch.to_string(),
     }
 }
