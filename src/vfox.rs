@@ -252,7 +252,9 @@ impl Vfox {
     fn extract(&self, file: &Path, install_dir: &Path) -> Result<()> {
         self.log_emit(format!("Extracting {file:?} to {install_dir:?}"));
         let filename = file.file_name().unwrap().to_string_lossy().to_string();
-        let tmp = TempDir::with_prefix_in(&filename, install_dir.parent().unwrap())?;
+        let parent = install_dir.parent().unwrap();
+        file::mkdirp(parent)?;
+        let tmp = TempDir::with_prefix_in(&filename, parent)?;
         file::remove_dir_all(install_dir)?;
         let move_to_install = || {
             let subdirs = file::ls(tmp.path())?;
