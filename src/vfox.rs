@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::sync::mpsc;
+use tempfile::TempDir;
 use xx::file;
 
 use crate::error::Result;
@@ -26,7 +27,6 @@ pub struct Vfox {
     pub plugin_dir: PathBuf,
     pub cache_dir: PathBuf,
     pub download_dir: PathBuf,
-    pub temp_dir: PathBuf,
     log_tx: Option<mpsc::Sender<String>>,
 }
 
@@ -252,31 +252,29 @@ impl Vfox {
     fn extract(&self, file: &Path, install_dir: &Path) -> Result<()> {
         self.log_emit(format!("Extracting {file:?} to {install_dir:?}"));
         let filename = file.file_name().unwrap().to_string_lossy().to_string();
-        let tmp = self.temp_dir.join(&filename);
-        file::remove_dir_all(&tmp)?;
+        let tmp = TempDir::with_prefix_in(&filename, install_dir.parent().unwrap())?;
         file::remove_dir_all(install_dir)?;
         let move_to_install = || {
-            let subdirs = file::ls(&tmp)?;
+            let subdirs = file::ls(tmp.path())?;
             if subdirs.len() == 1 && subdirs.first().unwrap().is_dir() {
                 let subdir = subdirs.first().unwrap();
                 file::mv(subdir, install_dir)?;
-                file::remove_dir_all(&tmp)?;
             } else {
-                file::mv(&tmp, install_dir)?;
+                file::mv(tmp.path(), install_dir)?;
             }
             Result::Ok(())
         };
         if filename.ends_with(".tar.gz") {
-            xx::archive::untar_gz(file, &tmp)?;
+            xx::archive::untar_gz(file, tmp.path())?;
             move_to_install()?;
         } else if filename.ends_with(".tar.xz") {
-            xx::archive::untar_xz(file, &tmp)?;
+            xx::archive::untar_xz(file, tmp.path())?;
             move_to_install()?;
         } else if filename.ends_with(".tar.bz2") {
-            xx::archive::untar_bz2(file, &tmp)?;
+            xx::archive::untar_bz2(file, tmp.path())?;
             move_to_install()?;
         } else if filename.ends_with(".zip") {
-            xx::archive::unzip(file, &tmp)?;
+            xx::archive::unzip(file, tmp.path())?;
             move_to_install()?;
         } else {
             file::mv(file, install_dir.join(&filename))?;
@@ -295,7 +293,6 @@ impl Default for Vfox {
             cache_dir: home().join(".version-fox/cache"),
             download_dir: home().join(".version-fox/downloads"),
             install_dir: home().join(".version-fox/installs"),
-            temp_dir: home().join(".version-fox/temp"),
             log_tx: None,
         }
     }
@@ -320,7 +317,6 @@ mod tests {
                 cache_dir: PathBuf::from("test/cache"),
                 download_dir: PathBuf::from("test/downloads"),
                 install_dir: PathBuf::from("test/installs"),
-                temp_dir: PathBuf::from("test/temp"),
                 log_tx: None,
             }
         }
