@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/jdx/vfox.rs/compare/v0.3.2..v0.3.3) - 2024-11-12
+
+### 🐛 Bug Fixes
+
+- installing when tmp is on a different drive by [@jdx](https://github.com/jdx) in [bfc9678](https://github.com/jdx/vfox.rs/commit/bfc967830ea4c704f3a16d31e49f037a208c39ec)
+- ensure tmp dir parent is created by [@jdx](https://github.com/jdx) in [d82537d](https://github.com/jdx/vfox.rs/commit/d82537dc8e8df878df1e4818c693c293d7ada3d3)
+
 ## [0.3.2](https://github.com/jdx/vfox.rs/compare/v0.3.1..v0.3.2) - 2024-11-11
 
 ### 🐛 Bug Fixes
