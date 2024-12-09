@@ -30,7 +30,7 @@ serde_json = "1"
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "fs"] }
 url = "2"
-xx = { version = "1", features = ["archive", "hash", "http"] }
+xx = { version = "2", features = ["archive", "hash", "http"] }
 
 # cli dependencies
 env_logger = { version = "0.11", optional = true }

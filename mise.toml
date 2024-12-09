@@ -18,3 +18,5 @@ run = "prettier -c ."
 run = 'cargo clippy --all --all-features -- -D warnings'
 [tasks."lint:fmt"]
 run = 'cargo fmt --all -- --check'
+[tasks.pre-commit]
+depends = ['lint:*']
