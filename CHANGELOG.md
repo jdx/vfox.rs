@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.5](https://github.com/jdx/vfox.rs/compare/v0.3.4..v0.3.5) - 2025-01-08
+
+### 🔍 Other Changes
+
+- Update LICENSE by [@jdx](https://github.com/jdx) in [b2b4eb9](https://github.com/jdx/vfox.rs/commit/b2b4eb9b34dd7e3f2df1e7b6e2ada2f75ceff725)
+
+### 📦️ Dependency Updates
+
+- update rust crate itertools to 0.14 by [@renovate[bot]](https://github.com/renovate[bot]) in [#74](https://github.com/jdx/vfox.rs/pull/74)
+
 ## [0.3.4](https://github.com/jdx/vfox.rs/compare/v0.3.3..v0.3.4) - 2024-12-09
 
 ### 🔍 Other Changes
