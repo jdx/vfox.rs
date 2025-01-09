@@ -121,6 +121,7 @@ impl Plugin {
             lua_mod::http(&self.lua)?;
             lua_mod::json(&self.lua)?;
             lua_mod::strings(&self.lua)?;
+            lua_mod::env(&self.lua)?;
 
             let metadata = self.load_metadata()?;
             self.set_global("PLUGIN", metadata.clone())?;

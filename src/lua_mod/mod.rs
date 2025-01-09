@@ -1,4 +1,5 @@
 mod archiver;
+mod env;
 mod file;
 mod hooks;
 mod html;
@@ -7,6 +8,7 @@ mod json;
 mod strings;
 
 pub use archiver::mod_archiver as archiver;
+pub use env::mod_env as env;
 pub use file::mod_file as file;
 pub use hooks::mod_hooks as hooks;
 pub use html::mod_html as html;
