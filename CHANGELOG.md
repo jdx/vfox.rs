@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.0](https://github.com/jdx/vfox.rs/compare/v0.3.5..1.0.0) - 2025-01-09
+
+### 🐛 Bug Fixes
+
+- added os.setenv by [@jdx](https://github.com/jdx) in [#76](https://github.com/jdx/vfox.rs/pull/76)
+
+### 🔍 Other Changes
+
+- cargo up by [@jdx](https://github.com/jdx) in [9e3d66e](https://github.com/jdx/vfox.rs/commit/9e3d66e2738c03518b4f33380e65b98b4744b63e)
+
 ## [0.3.5](https://github.com/jdx/vfox.rs/compare/v0.3.4..v0.3.5) - 2025-01-08
 
 ### 🔍 Other Changes
