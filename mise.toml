@@ -7,6 +7,7 @@
 [tasks.build]
 run = "cargo build"
 [tasks.test]
+alias = "t"
 run = "cargo test"
 [tasks.lint-fix]
 run = "cargo fmt --all && cargo clippy --fix --all --all-features --allow-dirty --allow-staged -- -D warnings"
