@@ -110,8 +110,8 @@ impl Vfox {
     pub fn install_plugin_from_url(&self, url: &Url) -> Result<Plugin> {
         let sdk = url
             .path_segments()
-            .and_then(|s| {
-                let filename = s.last().unwrap();
+            .and_then(|mut s| {
+                let filename = s.next_back().unwrap();
                 filename
                     .strip_prefix("vfox-")
                     .map(|s| s.to_string())
@@ -121,7 +121,7 @@ impl Vfox {
         let plugin_dir = self.plugin_dir.join(&sdk);
         if !plugin_dir.exists() {
             debug!("Installing plugin {sdk}");
-            xx::git::clone(url.as_ref(), &plugin_dir)?;
+            xx::git::clone(url.as_ref(), &plugin_dir, &Default::default())?;
         }
         Plugin::from_dir(&plugin_dir)
     }
@@ -222,7 +222,7 @@ impl Vfox {
         self.log_emit(format!("Downloading {url}"));
         let filename = url
             .path_segments()
-            .and_then(|s| s.last())
+            .and_then(|mut s| s.next_back())
             .ok_or("No filename in URL")?;
         let file = self
             .download_dir
