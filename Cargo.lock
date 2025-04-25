@@ -2707,9 +2707,9 @@ dependencies = [
 
 [[package]]
 name = "xx"
-version = "2.0.4"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "660d7629bc5d128108fc09a32b5187442de98ba1ad9c4681c5381cf53733aa0d"
+checksum = "e9a93c5b2191a4bdcbd320bb847ad302defbf37f2e517b1fe93984ed5217aa90"
 dependencies = [
  "bzip2 0.5.0",
  "duct",
