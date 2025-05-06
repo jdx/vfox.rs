@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.2](https://github.com/jdx/vfox.rs/compare/v1.0.1..v1.0.2) - 2025-05-06
+
+### 🔍 Other Changes
+
+- lock mlua to 0.10.3 for now by [@jdx](https://github.com/jdx) in [a6ef55c](https://github.com/jdx/vfox.rs/commit/a6ef55c721b0d9618ff41546e4979e2e605af334)
+
 ## [1.0.1](https://github.com/jdx/vfox.rs/compare/v1.0.0..v1.0.1) - 2025-02-02
 
 ### 🔍 Other Changes
