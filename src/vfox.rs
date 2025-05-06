@@ -144,7 +144,7 @@ impl Vfox {
         let sdk = self.get_sdk(sdk)?;
         let pre_install = sdk.pre_install(version).await?;
         let install_dir = install_dir.as_ref();
-        trace!("{:?}", pre_install);
+        trace!("{pre_install:?}");
         if let Some(url) = pre_install.url.as_ref().map(|s| Url::from_str(s)) {
             let file = self.download(&url?, &sdk, version).await?;
             self.verify(&pre_install, &file)?;
