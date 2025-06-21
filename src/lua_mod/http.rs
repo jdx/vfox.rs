@@ -1,4 +1,13 @@
 use mlua::{ExternalResult, Lua, MultiValue, Result, Table};
+use reqwest::{Client, ClientBuilder};
+use std::sync::LazyLock;
+
+static CLIENT: LazyLock<Client> = LazyLock::new(|| {
+    ClientBuilder::new()
+        .user_agent(format!("vfox.rs/{}", env!("CARGO_PKG_VERSION")))
+        .build()
+        .expect("Failed to create reqwest client")
+});
 
 pub fn mod_http(lua: &Lua) -> Result<()> {
     let package: Table = lua.globals().get("package")?;
@@ -30,10 +39,7 @@ pub fn mod_http(lua: &Lua) -> Result<()> {
 
 async fn get(lua: &Lua, input: Table) -> Result<Table> {
     let url: String = input.get("url").into_lua_err()?;
-    let resp = reqwest::get(&url)
-        .await
-        // .and_then(|resp| resp.error_for_status())
-        .into_lua_err()?;
+    let resp = CLIENT.get(&url).send().await.into_lua_err()?;
     let t = lua.create_table()?;
     t.set("status_code", resp.status().as_u16())?;
     t.set("headers", get_headers(lua, resp.headers())?)?;
@@ -45,7 +51,7 @@ async fn download_file(_lua: &Lua, input: MultiValue) -> Result<()> {
     let t: &Table = input.iter().next().unwrap().as_table().unwrap();
     let url: String = t.get("url").into_lua_err()?;
     let path: String = input.iter().nth(1).unwrap().to_string()?;
-    let resp = reqwest::get(&url).await.into_lua_err()?;
+    let resp = CLIENT.get(&url).send().await.into_lua_err()?;
     resp.error_for_status_ref().into_lua_err()?;
     let mut file = tokio::fs::File::create(&path).await.into_lua_err()?;
     let bytes = resp.bytes().await.into_lua_err()?;
@@ -57,12 +63,7 @@ async fn download_file(_lua: &Lua, input: MultiValue) -> Result<()> {
 
 async fn head(lua: &Lua, input: Table) -> Result<Table> {
     let url: String = input.get("url").into_lua_err()?;
-    let resp = reqwest::Client::new()
-        .head(&url)
-        .send()
-        .await
-        // .and_then(|resp| resp.error_for_status())
-        .into_lua_err()?;
+    let resp = CLIENT.head(&url).send().await.into_lua_err()?;
     let t = lua.create_table()?;
     t.set("status_code", resp.status().as_u16())?;
     t.set("headers", get_headers(lua, resp.headers())?)?;
