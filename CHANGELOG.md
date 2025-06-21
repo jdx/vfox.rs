@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.0.3](https://github.com/jdx/vfox.rs/compare/v1.0.2..v1.0.3) - 2025-06-21
+
+### 🐛 Bug Fixes
+
+- add user agents to http requests by [@risu729](https://github.com/risu729) in [#100](https://github.com/jdx/vfox.rs/pull/100)
+
+### 🔍 Other Changes
+
+- rustfmt by [@jdx](https://github.com/jdx) in [#101](https://github.com/jdx/vfox.rs/pull/101)
+- updated deps by [@jdx](https://github.com/jdx) in [5bbb363](https://github.com/jdx/vfox.rs/commit/5bbb363f82fd8db0bf32498383d29f7d032f79f2)
+
+### 📦️ Dependency Updates
+
+- update rust crate mlua to v0.10.5 by [@renovate[bot]](https://github.com/renovate[bot]) in [#96](https://github.com/jdx/vfox.rs/pull/96)
+
+### New Contributors
+
+- @risu729 made their first contribution in [#100](https://github.com/jdx/vfox.rs/pull/100)
+
 ## [1.0.2](https://github.com/jdx/vfox.rs/compare/v1.0.1..v1.0.2) - 2025-05-06
 
 ### 🔍 Other Changes
