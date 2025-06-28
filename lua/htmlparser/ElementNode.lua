@@ -156,7 +156,7 @@ function ElementNode:close(closestart, closeend)
 		node = node.parent
 		if not node then break end
 		node.deepernodes:add(self)
-		insert(node.deeperelements, self.name, self)
+		insert(node.deeperelements, string.lower(self.name), self)
 		for k in pairs(self.attributes) do
 			insert(node.deeperattributes, k, self)
 		end
