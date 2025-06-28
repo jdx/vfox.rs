@@ -15,6 +15,7 @@ use crate::hooks::mise_path::MisePathContext;
 use crate::hooks::parse_legacy_file::ParseLegacyFileResponse;
 use crate::hooks::post_install::PostInstallContext;
 use crate::hooks::pre_install::PreInstall;
+use crate::http::CLIENT;
 use crate::metadata::Metadata;
 use crate::plugin::Plugin;
 use crate::registry;
@@ -224,12 +225,17 @@ impl Vfox {
             .path_segments()
             .and_then(|mut s| s.next_back())
             .ok_or("No filename in URL")?;
-        let file = self
+        let path = self
             .download_dir
             .join(format!("{sdk}-{version}"))
             .join(filename);
-        xx::http::download(url.clone(), &file).await?;
-        Ok(file)
+        let resp = CLIENT.get(url.clone()).send().await?;
+        resp.error_for_status_ref()?;
+        file::mkdirp(path.parent().unwrap())?;
+        let mut file = tokio::fs::File::create(&path).await?;
+        let bytes = resp.bytes().await?;
+        tokio::io::AsyncWriteExt::write_all(&mut file, &bytes).await?;
+        Ok(path)
     }
 
     fn verify(&self, pre_install: &PreInstall, file: &Path) -> Result<()> {
