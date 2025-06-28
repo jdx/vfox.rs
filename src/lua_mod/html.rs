@@ -78,8 +78,8 @@ mod tests {
         mod_html(&lua).unwrap();
         lua.load(mlua::chunk! {
             local html = require("html")
-            local doc = html.parse("<html><body><div id='t2' name='123'>456</div><div foo='bar'>222</div></body></html>")
-            local f = doc:find("div"):eq(0)
+            local doc = html.parse("<html><body><div id='t2' name='123'>456</div><DIV foo='bar'>222</DIV></body></html>")
+            local f = doc:find("DIV"):eq(0)
             local s = doc:find("div"):eq(1)
             assert(s:text() == "222")
             assert(f:text() == "456")
