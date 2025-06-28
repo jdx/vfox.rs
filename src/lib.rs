@@ -14,6 +14,7 @@ pub use vfox::Vfox;
 mod config;
 mod context;
 mod error;
+mod http;
 mod hooks;
 mod lua_mod;
 mod metadata;
