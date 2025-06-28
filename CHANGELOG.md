@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.4](https://github.com/jdx/vfox.rs/compare/v1.0.3..v1.0.4) - 2025-06-28
+
+### 🐛 Bug Fixes
+
+- add user agent to download requests by [@risu729](https://github.com/risu729) in [#104](https://github.com/jdx/vfox.rs/pull/104)
+
 ## [1.0.3](https://github.com/jdx/vfox.rs/compare/v1.0.2..v1.0.3) - 2025-06-21
 
 ### 🐛 Bug Fixes

@@ -1,13 +1,6 @@
 use mlua::{ExternalResult, Lua, MultiValue, Result, Table};
-use reqwest::{Client, ClientBuilder};
-use std::sync::LazyLock;
 
-static CLIENT: LazyLock<Client> = LazyLock::new(|| {
-    ClientBuilder::new()
-        .user_agent(format!("vfox.rs/{}", env!("CARGO_PKG_VERSION")))
-        .build()
-        .expect("Failed to create reqwest client")
-});
+use crate::http::CLIENT;
 
 pub fn mod_http(lua: &Lua) -> Result<()> {
     let package: Table = lua.globals().get("package")?;

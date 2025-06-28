@@ -15,6 +15,7 @@ mod config;
 mod context;
 mod error;
 mod hooks;
+mod http;
 mod lua_mod;
 mod metadata;
 mod plugin;
