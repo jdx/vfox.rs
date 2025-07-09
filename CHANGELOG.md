@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.5](https://github.com/jdx/vfox.rs/compare/v1.0.4..v1.0.5) - 2025-07-09
+
+### 🐛 Bug Fixes
+
+- support capital HTML tags by [@risu729](https://github.com/risu729) in [#106](https://github.com/jdx/vfox.rs/pull/106)
+
 ## [1.0.4](https://github.com/jdx/vfox.rs/compare/v1.0.3..v1.0.4) - 2025-06-28
 
 ### 🐛 Bug Fixes
