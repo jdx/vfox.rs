@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.5](https://github.com/jdx/vfox.rs/compare/v1.0.4..v1.0.5) - 2025-07-09
+## [1.0.5](https://github.com/jdx/vfox.rs/compare/v1.0.4..v1.0.5) - 2025-07-12
 
 ### 🐛 Bug Fixes
 
