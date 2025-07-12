@@ -2368,6 +2368,7 @@ dependencies = [
  "once_cell",
  "reqwest",
  "serde",
+ "serde_derive",
  "serde_json",
  "tempfile",
  "thiserror",

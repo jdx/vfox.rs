@@ -9,6 +9,12 @@ use xx::file;
 
 use crate::error::Result;
 use crate::hooks::available::AvailableVersion;
+use crate::hooks::backend_exec_env::{BackendExecEnvContext, BackendExecEnvResponse};
+use crate::hooks::backend_install::{BackendInstallContext, BackendInstallResponse};
+use crate::hooks::backend_list_versions::{
+    BackendListVersionsContext, BackendListVersionsResponse,
+};
+use crate::hooks::backend_uninstall::{BackendUninstallContext, BackendUninstallResponse};
 use crate::hooks::env_keys::{EnvKey, EnvKeysContext};
 use crate::hooks::mise_env::MiseEnvContext;
 use crate::hooks::mise_path::MisePathContext;
@@ -219,6 +225,52 @@ impl Vfox {
         sdk.parse_legacy_file(file).await
     }
 
+    pub async fn is_backend_enabled(&self, sdk: &str) -> Result<bool> {
+        let metadata = self.metadata(sdk).await?;
+        Ok(metadata.backend_enabled)
+    }
+
+    pub async fn get_backend_name(&self, sdk: &str) -> Result<Option<String>> {
+        let metadata = self.metadata(sdk).await?;
+        Ok(metadata.backend_name)
+    }
+
+    pub async fn backend_exec_env(
+        &self,
+        sdk: &str,
+        ctx: BackendExecEnvContext,
+    ) -> Result<BackendExecEnvResponse> {
+        let plugin = self.get_sdk(sdk)?;
+        plugin.backend_exec_env(ctx).await
+    }
+
+    pub async fn backend_install(
+        &self,
+        sdk: &str,
+        ctx: BackendInstallContext,
+    ) -> Result<BackendInstallResponse> {
+        let plugin = self.get_sdk(sdk)?;
+        plugin.backend_install(ctx).await
+    }
+
+    pub async fn backend_list_versions(
+        &self,
+        sdk: &str,
+        ctx: BackendListVersionsContext,
+    ) -> Result<BackendListVersionsResponse> {
+        let plugin = self.get_sdk(sdk)?;
+        plugin.backend_list_versions(ctx).await
+    }
+
+    pub async fn backend_uninstall(
+        &self,
+        sdk: &str,
+        ctx: BackendUninstallContext,
+    ) -> Result<BackendUninstallResponse> {
+        let plugin = self.get_sdk(sdk)?;
+        plugin.backend_uninstall(ctx).await
+    }
+
     async fn download(&self, url: &Url, sdk: &Plugin, version: &str) -> Result<PathBuf> {
         self.log_emit(format!("Downloading {url}"));
         let filename = url
@@ -422,5 +474,172 @@ mod tests {
         let metadata = vfox.metadata("nodejs").await.unwrap();
         let out = format!("{:?}", metadata);
         assert_snapshot!(out);
+    }
+
+    #[tokio::test]
+    async fn test_backend_disabled_by_default() {
+        let vfox = Vfox::test();
+        vfox.install_plugin("nodejs").unwrap();
+
+        // Test that backend is disabled by default
+        let is_enabled = vfox.is_backend_enabled("nodejs").await.unwrap();
+        assert!(!is_enabled);
+
+        let backend_name = vfox.get_backend_name("nodejs").await.unwrap();
+        assert_eq!(backend_name, None);
+    }
+
+    #[tokio::test]
+    async fn test_backend_operations_with_disabled_backend() {
+        let vfox = Vfox::test();
+        vfox.install_plugin("nodejs").unwrap();
+
+        let ctx = BackendListVersionsContext {
+            args: vec![],
+            tool: "test-tool".to_string(),
+            options: Default::default(),
+        };
+
+        // Should return an error when backend is not enabled
+        let result = vfox.backend_list_versions("nodejs", ctx).await;
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("does not support backend operations"));
+    }
+
+    #[tokio::test]
+    async fn test_backend_operations_with_enabled_backend() {
+        let vfox = Vfox::test();
+
+        // Create a test plugin with backend support
+        setup_test_backend_plugin(&vfox, "test-backend").await;
+
+        // Test is_backend_enabled
+        let is_enabled = vfox.is_backend_enabled("test-backend").await.unwrap();
+        assert!(is_enabled);
+
+        // Test get_backend_name
+        let backend_name = vfox.get_backend_name("test-backend").await.unwrap();
+        assert_eq!(backend_name, Some("test-backend".to_string()));
+
+        // Test backend_list_versions
+        let ctx = BackendListVersionsContext {
+            args: vec![],
+            tool: "test-tool".to_string(),
+            options: Default::default(),
+        };
+        let response = vfox
+            .backend_list_versions("test-backend", ctx)
+            .await
+            .unwrap();
+        assert_eq!(response.versions, vec!["1.0.0", "1.1.0", "2.0.0"]);
+
+        // Test backend_install
+        let install_ctx = BackendInstallContext {
+            args: vec![],
+            tool: "test-tool".to_string(),
+            version: "1.0.0".to_string(),
+            install_path: vfox.install_dir.join("test-backend").join("1.0.0"),
+            options: Default::default(),
+        };
+        let install_response = vfox
+            .backend_install("test-backend", install_ctx)
+            .await
+            .unwrap();
+        assert!(install_response.success);
+        assert_eq!(
+            install_response.message,
+            Some("Installation successful".to_string())
+        );
+
+        // Test backend_exec_env
+        let exec_ctx = BackendExecEnvContext {
+            args: vec![],
+            tool: "test-tool".to_string(),
+            version: "1.0.0".to_string(),
+            install_path: vfox.install_dir.join("test-backend").join("1.0.0"),
+            options: Default::default(),
+        };
+        let exec_response = vfox
+            .backend_exec_env("test-backend", exec_ctx)
+            .await
+            .unwrap();
+        assert_eq!(exec_response.env_vars.len(), 2);
+        assert_eq!(exec_response.env_vars[0].key, "TEST_BACKEND_ROOT");
+        assert_eq!(exec_response.env_vars[1].key, "PATH");
+
+        // Test backend_uninstall
+        let uninstall_ctx = BackendUninstallContext {
+            args: vec![],
+            tool: "test-tool".to_string(),
+            version: "1.0.0".to_string(),
+            install_path: vfox.install_dir.join("test-backend").join("1.0.0"),
+            options: Default::default(),
+        };
+        let uninstall_response = vfox
+            .backend_uninstall("test-backend", uninstall_ctx)
+            .await
+            .unwrap();
+        assert!(uninstall_response.success);
+        assert_eq!(
+            uninstall_response.message,
+            Some("Uninstallation successful".to_string())
+        );
+    }
+
+    async fn setup_test_backend_plugin(vfox: &Vfox, plugin_name: &str) {
+        use std::fs;
+
+        let plugin_dir = vfox.plugin_dir.join(plugin_name);
+        fs::create_dir_all(&plugin_dir).unwrap();
+
+        // Create metadata.lua with backend support
+        let metadata_content = format!(
+            r#"
+PLUGIN = {{
+    name = "{0}",
+    version = "1.0.0",
+    description = "Test plugin with backend support",
+    author = "Test",
+    license = "MIT",
+    backendEnabled = true,
+    backendName = "{0}",
+    
+    backend_list_versions = function(ctx)
+        return {{
+            versions = {{"1.0.0", "1.1.0", "2.0.0"}}
+        }}
+    end,
+    
+    backend_install = function(ctx)
+        return {{
+            success = true,
+            message = "Installation successful"
+        }}
+    end,
+    
+    backend_exec_env = function(ctx)
+        return {{
+            env_vars = {{
+                {{key = "TEST_BACKEND_ROOT", value = ctx.install_path}},
+                {{key = "PATH", value = ctx.install_path .. "/bin"}}
+            }}
+        }}
+    end,
+    
+    backend_uninstall = function(ctx)
+        return {{
+            success = true,
+            message = "Uninstallation successful"
+        }}
+    end
+}}
+"#,
+            plugin_name
+        );
+
+        fs::write(plugin_dir.join("metadata.lua"), metadata_content).unwrap();
     }
 }

@@ -1,5 +1,6 @@
 use mlua::prelude::LuaError;
 use mlua::{FromLua, IntoLua, Lua, Value};
+use serde_derive::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
@@ -7,7 +8,7 @@ use crate::error::Result;
 use crate::sdk_info::SdkInfo;
 use crate::Plugin;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EnvKey {
     pub key: String,
     pub value: String,
