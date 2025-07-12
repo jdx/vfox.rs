@@ -14,6 +14,8 @@ pub struct Metadata {
     pub license: Option<String>,
     pub homepage: Option<String>,
     pub hooks: BTreeSet<&'static str>,
+    pub backend_enabled: bool,
+    pub backend_name: Option<String>,
 }
 
 impl TryFrom<Table> for Metadata {
@@ -22,6 +24,9 @@ impl TryFrom<Table> for Metadata {
         let legacy_filenames = t
             .get::<Option<Vec<String>>>("legacyFilenames")?
             .unwrap_or_default();
+        let backend_enabled = t.get::<Option<bool>>("backendEnabled")?.unwrap_or(false);
+        let backend_name = t.get::<Option<String>>("backendName")?;
+
         Ok(Metadata {
             name: t.get("name")?,
             legacy_filenames,
@@ -31,6 +36,8 @@ impl TryFrom<Table> for Metadata {
             license: t.get("license")?,
             homepage: t.get("homepage")?,
             hooks: Default::default(),
+            backend_enabled,
+            backend_name,
         })
     }
 }

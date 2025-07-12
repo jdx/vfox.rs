@@ -2,12 +2,18 @@ use std::cmp::Ordering;
 use std::fmt::Display;
 use std::path::{Path, PathBuf};
 
-use mlua::{AsChunk, FromLuaMulti, IntoLua, Lua, Table};
+use mlua::{AsChunk, FromLuaMulti, IntoLua, Lua, Table, Value};
 use once_cell::sync::OnceCell;
 
 use crate::config::Config;
 use crate::context::Context;
 use crate::error::Result;
+use crate::hooks::backend_exec_env::{BackendExecEnvContext, BackendExecEnvResponse};
+use crate::hooks::backend_install::{BackendInstallContext, BackendInstallResponse};
+use crate::hooks::backend_list_versions::{
+    BackendListVersionsContext, BackendListVersionsResponse,
+};
+use crate::hooks::backend_uninstall::{BackendUninstallContext, BackendUninstallResponse};
 use crate::metadata::Metadata;
 use crate::runtime::Runtime;
 use crate::sdk_info::SdkInfo;
@@ -103,6 +109,136 @@ impl Plugin {
         Ok(result)
     }
 
+    pub async fn backend_exec_env(
+        &self,
+        ctx: BackendExecEnvContext,
+    ) -> Result<BackendExecEnvResponse> {
+        let metadata = self.get_metadata()?;
+        if !metadata.backend_enabled {
+            return Err(VfoxError::Error(
+                "Plugin does not support backend operations".to_string(),
+            ));
+        }
+        if !metadata.hooks.contains("backend_exec_env") {
+            return Err(VfoxError::HookNotFound("backend_exec_env".to_string()));
+        }
+
+        trace!("Calling backend_exec_env hook");
+
+        // Set the context in Lua globals
+        self.lua.globals().set("CTX", ctx)?;
+
+        let res = self
+            .eval_async::<Table>(
+                r#"
+            local result = PLUGIN.backend_exec_env(CTX)
+            return result
+        "#,
+            )
+            .await?;
+
+        let env_vars: Vec<crate::hooks::env_keys::EnvKey> = res.get("env_vars")?;
+        Ok(BackendExecEnvResponse { env_vars })
+    }
+
+    pub async fn backend_install(
+        &self,
+        ctx: BackendInstallContext,
+    ) -> Result<BackendInstallResponse> {
+        let metadata = self.get_metadata()?;
+        if !metadata.backend_enabled {
+            return Err(VfoxError::Error(
+                "Plugin does not support backend operations".to_string(),
+            ));
+        }
+        if !metadata.hooks.contains("backend_install") {
+            return Err(VfoxError::HookNotFound("backend_install".to_string()));
+        }
+
+        trace!("Calling backend_install hook");
+
+        // Set the context in Lua globals
+        self.lua.globals().set("CTX", ctx)?;
+
+        let res = self
+            .eval_async::<Table>(
+                r#"
+            local result = PLUGIN.backend_install(CTX)
+            return result
+        "#,
+            )
+            .await?;
+
+        let success: bool = res.get("success")?;
+        let message: Option<String> = res.get("message")?;
+        Ok(BackendInstallResponse { success, message })
+    }
+
+    pub async fn backend_list_versions(
+        &self,
+        ctx: BackendListVersionsContext,
+    ) -> Result<BackendListVersionsResponse> {
+        let metadata = self.get_metadata()?;
+        if !metadata.backend_enabled {
+            return Err(VfoxError::Error(
+                "Plugin does not support backend operations".to_string(),
+            ));
+        }
+        if !metadata.hooks.contains("backend_list_versions") {
+            return Err(VfoxError::HookNotFound("backend_list_versions".to_string()));
+        }
+
+        trace!("Calling backend_list_versions hook");
+
+        // Set the context in Lua globals
+        self.lua.globals().set("CTX", ctx)?;
+
+        let res = self
+            .eval_async::<Table>(
+                r#"
+            local result = PLUGIN.backend_list_versions(CTX)
+            return result
+        "#,
+            )
+            .await?;
+
+        let versions: Vec<String> = res.get("versions")?;
+        Ok(BackendListVersionsResponse { versions })
+    }
+
+    pub async fn backend_uninstall(
+        &self,
+        ctx: BackendUninstallContext,
+    ) -> Result<BackendUninstallResponse> {
+        let metadata = self.get_metadata()?;
+        if !metadata.backend_enabled {
+            return Err(VfoxError::Error(
+                "Plugin does not support backend operations".to_string(),
+            ));
+        }
+        if !metadata.hooks.contains("backend_uninstall") {
+            return Err(VfoxError::HookNotFound("backend_uninstall".to_string()));
+        }
+
+        trace!("Calling backend_uninstall hook");
+
+        // Set the context in Lua globals
+        self.lua.globals().set("CTX", ctx)?;
+
+        let res = self
+            .eval_async::<Table>(
+                r#"
+            local result = PLUGIN.backend_uninstall(CTX)
+            return result
+        "#,
+            )
+            .await?;
+
+        let success: bool = res.get("success")?;
+        let message: Option<String> = res.get("message")?;
+        Ok(BackendUninstallResponse { success, message })
+    }
+
     fn load(&self) -> Result<&Metadata> {
         self.metadata.get_or_try_init(|| {
             debug!("Getting metadata for {self}");
@@ -131,10 +267,33 @@ impl Plugin {
 
             let mut metadata: Metadata = metadata.try_into()?;
 
+            // Load file-based hooks
             metadata.hooks = lua_mod::hooks(&self.lua, &self.dir)?;
+
+            // Also check for backend hooks in the PLUGIN table
+            self.detect_backend_hooks(&mut metadata, &self.load_metadata()?)?;
 
             Ok(metadata)
         })
+    }
+
+    fn detect_backend_hooks(&self, metadata: &mut Metadata, plugin_table: &Table) -> Result<()> {
+        const BACKEND_HOOKS: [&str; 4] = [
+            "backend_list_versions",
+            "backend_install",
+            "backend_exec_env",
+            "backend_uninstall",
+        ];
+
+        for &hook_name in &BACKEND_HOOKS {
+            if let Ok(value) = plugin_table.get::<Value>(hook_name) {
+                if !value.is_nil() {
+                    metadata.hooks.insert(hook_name);
+                }
+            }
+        }
+
+        Ok(())
     }
 
     fn set_global<V>(&self, name: &str, value: V) -> Result<()>

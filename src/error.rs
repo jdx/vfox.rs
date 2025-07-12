@@ -7,6 +7,8 @@ use xx::XXError;
 pub enum VfoxError {
     #[error("{0}")]
     Error(String),
+    #[error("Hook not found: {0}")]
+    HookNotFound(String),
     #[error(transparent)]
     LuaError(#[from] MLuaError),
     #[error("serde_json")]
